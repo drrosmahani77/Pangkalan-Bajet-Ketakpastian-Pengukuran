@@ -24,6 +24,8 @@ import { PrintReport } from './components/PrintReport';
 import { RejectModal } from './components/RejectModal';
 import { TemplateModal } from './components/TemplateModal';
 import { EquipmentLibraryModal } from './components/EquipmentLibraryModal';
+import { CommandPaletteModal } from './components/CommandPaletteModal';
+import { QuickPreviewDrawer } from './components/QuickPreviewDrawer';
 
 type ActiveView = 'DASHBOARD' | 'BUILDER' | 'PRINT';
 
@@ -33,11 +35,25 @@ export default function App() {
   const [budgets, setBudgets] = useState<UncertaintyBudget[]>([]);
   const [selectedBudget, setSelectedBudget] = useState<UncertaintyBudget | null>(null);
 
-  // Modals
+  // Modals & Drawers
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [isGlobalEquipmentModalOpen, setIsGlobalEquipmentModalOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [quickPreviewBudget, setQuickPreviewBudget] = useState<UncertaintyBudget | null>(null);
   const [rejectingBudget, setRejectingBudget] = useState<UncertaintyBudget | null>(null);
+
+  // Global Keyboard Shortcut: Cmd+K / Ctrl+K for Command Palette
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Initialize budgets from localStorage
   useEffect(() => {
@@ -352,6 +368,7 @@ export default function App() {
           setSelectedBudget(null);
         }}
         onOpenEquipmentLibrary={() => setIsGlobalEquipmentModalOpen(true)}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         activeViewTitle={
           activeView === 'BUILDER' && selectedBudget
             ? `${selectedBudget.testCode} · ${selectedBudget.testName}`
@@ -380,6 +397,7 @@ export default function App() {
               setSelectedBudget(budget);
               setActiveView('PRINT');
             }}
+            onQuickPreview={(budget) => setQuickPreviewBudget(budget)}
           />
         )}
 
@@ -412,6 +430,40 @@ export default function App() {
         )}
 
       </main>
+
+      {/* Quick Command Palette (Cmd+K / Ctrl+K) */}
+      <CommandPaletteModal
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        budgets={budgets}
+        currentRole={currentRole}
+        onSelectBudget={(budget) => {
+          setSelectedBudget(budget);
+          setActiveView('BUILDER');
+        }}
+        onCreateNew={handleCreateNew}
+        onOpenTemplates={() => setIsTemplateModalOpen(true)}
+        onOpenEquipment={() => setIsGlobalEquipmentModalOpen(true)}
+        onToggleRole={() => setCurrentRole(r => r === 'ANALYST' ? 'MANAGER' : 'ANALYST')}
+        onResetDemo={handleResetDemo}
+      />
+
+      {/* Quick Preview Slide-over Drawer */}
+      <QuickPreviewDrawer
+        isOpen={quickPreviewBudget !== null}
+        budget={quickPreviewBudget}
+        onClose={() => setQuickPreviewBudget(null)}
+        onOpenBuilder={(budget) => {
+          setQuickPreviewBudget(null);
+          setSelectedBudget(budget);
+          setActiveView('BUILDER');
+        }}
+        onOpenPrint={(budget) => {
+          setQuickPreviewBudget(null);
+          setSelectedBudget(budget);
+          setActiveView('PRINT');
+        }}
+      />
 
       {/* Starter Templates Modal */}
       <TemplateModal

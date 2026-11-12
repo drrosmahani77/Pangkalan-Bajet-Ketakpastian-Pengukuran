@@ -44,6 +44,9 @@ import {
 
 import { FormulaInspectorModal } from './FormulaInspectorModal';
 import { ParetoAnalysisChart } from './ParetoAnalysisChart';
+import { UncertaintyCurveChart } from './UncertaintyCurveChart';
+import { WhatIfSimulator } from './WhatIfSimulator';
+import { ReplicateScatterPlot } from './ReplicateScatterPlot';
 import { BatchPasteModal } from './BatchPasteModal';
 import { EquipmentLibraryModal } from './EquipmentLibraryModal';
 import { VersionDiffModal } from './VersionDiffModal';
@@ -359,6 +362,14 @@ export const BudgetBuilder: React.FC<BudgetBuilderProps> = ({
 
   const meanVal = currentBudget.category === 'CHEMICAL' ? currentBudget.typeA.mean : (currentBudget.biologyData?.meanLog || 0);
   const relativeU = meanVal > 0 ? (currentBudget.results.expandedUncertainty / Math.abs(meanVal)) * 100 : 0;
+
+  const [copiedStatement, setCopiedStatement] = useState(false);
+  const handleCopyStatement = () => {
+    const statement = reportingFormat === 'ISO_GUM' ? sigFigInfo.reported : currentBudget.results.reportedResult;
+    navigator.clipboard.writeText(statement);
+    setCopiedStatement(true);
+    setTimeout(() => setCopiedStatement(false), 2000);
+  };
 
   return (
     <div className="space-y-6 pb-20">
@@ -836,6 +847,15 @@ export const BudgetBuilder: React.FC<BudgetBuilderProps> = ({
                         </span>
                       </div>
                     </div>
+
+                    {/* Interactive Replicate Scatter Plot & Outlier Detector */}
+                    <ReplicateScatterPlot
+                      readings={currentBudget.typeA.readings}
+                      mean={currentBudget.typeA.mean}
+                      sd={currentBudget.typeA.sd}
+                      unit={currentBudget.unit}
+                      onRemoveReading={isReadOnly ? undefined : handleRemoveReading}
+                    />
                   </div>
                 ) : (
                   <p className="text-xs text-slate-400 italic">
@@ -1174,6 +1194,12 @@ export const BudgetBuilder: React.FC<BudgetBuilderProps> = ({
           {/* Section 3: UI 3 - Hybrid Pareto Analysis Chart Component */}
           <ParetoAnalysisChart budget={currentBudget} />
 
+          {/* Section 3B: Interactive Gaussian Uncertainty Visualizer */}
+          <UncertaintyCurveChart budget={currentBudget} />
+
+          {/* Section 3C: Metrology What-If Sensitivity Simulator */}
+          <WhatIfSimulator budget={currentBudget} />
+
           {/* Section 4: Audit Trail Log */}
           <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-2xs">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">
@@ -1258,19 +1284,39 @@ export const BudgetBuilder: React.FC<BudgetBuilderProps> = ({
                   <button
                     type="button"
                     onClick={() => setReportingFormat(f => f === 'ISO_GUM' ? 'RAW' : 'ISO_GUM')}
-                    className="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-sky-300 hover:text-white transition-colors"
+                    className="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-sky-300 hover:text-white transition-colors cursor-pointer"
                   >
                     {reportingFormat === 'ISO_GUM' ? t('btnToggleSigFigs') : t('btnToggleRaw')}
                   </button>
                 </div>
 
-                <div className="font-mono text-xs font-bold text-white leading-relaxed">
+                <div className="font-mono text-xs font-bold text-white leading-relaxed select-all">
                   {reportingFormat === 'ISO_GUM' ? sigFigInfo.reported : currentBudget.results.reportedResult}
                 </div>
 
-                <p className="text-[9.5px] text-slate-400 leading-tight">
-                  {reportingFormat === 'ISO_GUM' ? sigFigInfo.explanation : 'Format 4 tempat perpuluhan piawai.'}
-                </p>
+                <div className="flex items-center justify-between pt-1">
+                  <p className="text-[9.5px] text-slate-400 leading-tight">
+                    {reportingFormat === 'ISO_GUM' ? sigFigInfo.explanation : 'Format 4 tempat perpuluhan piawai.'}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleCopyStatement}
+                    className="inline-flex items-center gap-1 text-[10px] text-sky-400 hover:text-sky-300 transition-colors shrink-0 cursor-pointer"
+                    title={t('copyStatement')}
+                  >
+                    {copiedStatement ? (
+                      <>
+                        <Check className="w-3 h-3 text-emerald-400" />
+                        <span className="text-emerald-400 font-semibold">{t('copied')}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3 h-3" />
+                        <span>{t('copyStatement')}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
 
             </div>

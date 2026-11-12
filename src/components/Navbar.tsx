@@ -9,7 +9,8 @@ import {
   ShieldCheck,
   ChevronRight,
   Wrench,
-  Globe
+  Globe,
+  Search
 } from 'lucide-react';
 import { useLanguage } from '../utils/i18n';
 
@@ -21,6 +22,7 @@ interface NavbarProps {
   onResetDemo: () => void;
   onNavigateHome: () => void;
   onOpenEquipmentLibrary?: () => void;
+  onOpenCommandPalette?: () => void;
   activeViewTitle?: string;
 }
 
@@ -32,6 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onResetDemo,
   onNavigateHome,
   onOpenEquipmentLibrary,
+  onOpenCommandPalette,
   activeViewTitle,
 }) => {
   const { t, language, setLanguage } = useLanguage();
@@ -97,6 +100,22 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Zone 2 & 3: Role Switcher, Language Toggle & Utilities */}
         <div className="flex items-center gap-2 sm:gap-3">
+
+          {/* Interactive Command Palette Trigger (Cmd+K / Ctrl+K) */}
+          {onOpenCommandPalette && (
+            <button
+              type="button"
+              onClick={onOpenCommandPalette}
+              title="Carian Pintar & Perintah (Ctrl+K / Cmd+K)"
+              className="flex items-center gap-2 px-2.5 py-1 rounded-md text-xs font-medium text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700 border border-slate-700 transition-all shadow-2xs"
+            >
+              <Search className="w-3.5 h-3.5 text-sky-400" />
+              <span className="hidden md:inline text-slate-400">{t('cmdTriggerLabel')}</span>
+              <kbd className="hidden sm:inline-block px-1.5 py-0.2 text-[10px] font-mono text-slate-400 bg-slate-900 rounded border border-slate-700">
+                ⌘K
+              </kbd>
+            </button>
+          )}
           
           {/* Language Switcher Button (BM <-> EN) */}
           <button

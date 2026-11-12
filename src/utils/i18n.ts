@@ -265,6 +265,56 @@ export const translations = {
     signApprovedBy: 'Disemak & Diluluskan (Technical Manager):',
     dateLabel: 'Tarikh:',
     pageNumber: 'Halaman 1 daripada 1',
+
+    // Interactive Uncertainty Curve
+    curveTitle: 'Keluk Taburan Normal & Selang Keyakinan 95%',
+    curveSubtitle: 'Visualisasi interaktif ketumpatan kebarangkalian Gaussian u_c dan had liputan diperluas (k=2).',
+    curveCenterMean: 'Pusat Min Diukur (ȳ)',
+    curveCenterZero: 'Pusat Sifar (±U)',
+    curveCoverage95: 'Liputan 95.45% (k=2)',
+    curveMeasuredValue: 'Nilai Diukur (ȳ)',
+    curveLowerLimit: 'Had Bawah (ȳ - U)',
+    curveUpperLimit: 'Had Atas (ȳ + U)',
+    curveInteractiveHover: 'Arahkan kursor pada keluk untuk menganalisis ketumpatan f(x) dan skor z.',
+
+    // Interactive What-If Simulator
+    whatIfTitle: 'Simulasi Sensitiviti Metrologi ("What-If")',
+    whatIfSubtitle: 'Eksperimen interaktif: Uji bagaimana perubahan replikasi n atau penambahbaikan radas mengurangkan nilai U.',
+    whatIfSimulateN: 'Simulasi Saiz Replikasi (n):',
+    whatIfSimulateTopB: 'Simulasi Pengurangan Ralat Terbesar:',
+    whatIfBaselineU: 'Nilai U Semasa:',
+    whatIfProjectedU: 'Nilai U Tersimulasi:',
+    whatIfReduction: 'Penjimatan Ketakpastian:',
+    whatIfReset: 'Set Semula Simulasi',
+    whatIfApplyAdvice: 'Hasil simulasi menunjukkan potensi pengurangan U sebanyak',
+
+    // Command Palette & Quick Navigation
+    cmdPalettePlaceholder: 'Taip carian atau arahan makmal... (Cth: Cari SOP, Tukar Peranan, Bahasa)',
+    cmdPaletteNav: 'Navigasi Pantas',
+    cmdPaletteActions: 'Tindakan Makmal',
+    cmdPaletteMethods: 'Rekod Kaedah Ujian',
+    cmdToggleRole: 'Tukar Peranan Pengguna (Analyst / Manager)',
+    cmdToggleLang: 'Tukar Bahasa Antara Muka (BM / EN)',
+    cmdCreateBudget: 'Bina Bajet Ketakpastian Baharu',
+    cmdOpenTemplates: 'Buka Templat Kaedah Makmal',
+    cmdOpenEqLib: 'Buka Pustaka Radas & Sijil Kalibrasi',
+    cmdOpenA4: 'Pratonton Lembaran Laporan A4 WYSIWYG',
+    cmdOpenFormula: 'Buka Pemeriksa Formula Matematik',
+    cmdOpenWhatIf: 'Buka Simulasi Sensitiviti "What-If"',
+    cmdTriggerLabel: 'Cari / Perintah',
+
+    // Dot Plot & Outlier
+    dotPlotTitle: 'Plot Sebaran Replikasi & Pengesanan Outlier',
+    outlierWarning: 'Perhatian: Bacaan titik terpencil berpotensi dikesan (> 2.5s daripada min)',
+    copySuccess: 'Disalin ke papan keratan!',
+    copyStatement: 'Salin Kenyataan Pelaporan',
+    copied: 'Disalin!',
+    cmdResetDemo: 'Tetapkan Semula Data Contoh Makmal',
+    chemicalTab: 'Kimia (EURACHEM)',
+    biologicalTab: 'Biologi (ISO 19036)',
+    quickPreview: 'Pratonton Pantas',
+    sortBy: 'Susun mengikut',
+    allRecords: 'Semua Rekod',
   },
 
   en: {
@@ -527,6 +577,56 @@ export const translations = {
     signApprovedBy: 'Reviewed & Approved by (Technical Manager):',
     dateLabel: 'Date:',
     pageNumber: 'Page 1 of 1',
+
+    // Interactive Uncertainty Curve
+    curveTitle: 'Normal Distribution & 95% Confidence Visualizer',
+    curveSubtitle: 'Interactive visualization of the Gaussian probability density u_c and expanded interval (k=2).',
+    curveCenterMean: 'Measured Mean (ȳ)',
+    curveCenterZero: 'Zero Centered (±U)',
+    curveCoverage95: '95.45% Coverage (k=2)',
+    curveMeasuredValue: 'Measured Value (ȳ)',
+    curveLowerLimit: 'Lower Bound (ȳ - U)',
+    curveUpperLimit: 'Upper Bound (ȳ + U)',
+    curveInteractiveHover: 'Hover over the curve to inspect probability density f(x) and z-score.',
+
+    // Interactive What-If Simulator
+    whatIfTitle: 'Metrology "What-If" Sensitivity Simulator',
+    whatIfSubtitle: 'Interactive experimentation: test how changing sample size n or upgrading equipment reduces expanded U.',
+    whatIfSimulateN: 'Simulate Replicate Count (n):',
+    whatIfSimulateTopB: 'Simulate Dominant Error Reduction:',
+    whatIfBaselineU: 'Current U Value:',
+    whatIfProjectedU: 'Projected U Value:',
+    whatIfReduction: 'Uncertainty Reduction:',
+    whatIfReset: 'Reset Simulation',
+    whatIfApplyAdvice: 'Simulation projects an estimated U reduction of',
+
+    // Command Palette & Quick Navigation
+    cmdPalettePlaceholder: 'Type a command or search methods... (E.g. Search SOP, Switch Role, Language)',
+    cmdPaletteNav: 'Quick Navigation',
+    cmdPaletteActions: 'Laboratory Actions',
+    cmdPaletteMethods: 'Test Method Records',
+    cmdToggleRole: 'Toggle User Role (Analyst / Manager)',
+    cmdToggleLang: 'Toggle Interface Language (BM / EN)',
+    cmdCreateBudget: 'Create New Uncertainty Budget',
+    cmdOpenTemplates: 'Open Method Templates',
+    cmdOpenEqLib: 'Open Equipment Registry & Certificates',
+    cmdOpenA4: 'Preview A4 WYSIWYG Report Sheet',
+    cmdOpenFormula: 'Open Mathematical Formula Inspector',
+    cmdOpenWhatIf: 'Open "What-If" Sensitivity Simulator',
+    cmdTriggerLabel: 'Search / Command',
+
+    // Dot Plot & Outlier
+    dotPlotTitle: 'Replicate Scatter Plot & Outlier Inspection',
+    outlierWarning: 'Caution: Potential outlier reading detected (> 2.5s from mean)',
+    copySuccess: 'Copied to clipboard!',
+    copyStatement: 'Copy Reporting Statement',
+    copied: 'Copied!',
+    cmdResetDemo: 'Reset Demo Sample Data',
+    chemicalTab: 'Chemical (EURACHEM)',
+    biologicalTab: 'Biology (ISO 19036)',
+    quickPreview: 'Quick Preview',
+    sortBy: 'Sort by',
+    allRecords: 'All Records',
   },
 };
 
