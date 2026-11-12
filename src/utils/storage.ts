@@ -443,3 +443,120 @@ export function cloneApprovedBudget(
 
   return cloned;
 }
+
+const EQUIPMENT_STORAGE_KEY = 'labmu_pro_equipment_registry_v1';
+
+export const DEFAULT_EQUIPMENT_LIST: import('../types/labmu').EquipmentItem[] = [
+  {
+    id: 'eq-bal-01',
+    name: 'Neraca Analitikal Mettler Toledo XPE205',
+    category: 'BALANCE',
+    code: 'EQ-BAL-01',
+    certificateNo: 'CAL-2026-NM-042',
+    calibrationDate: '2026-01-15',
+    nextCalibrationDate: '2027-01-14',
+    statedUncertainty: 0.0002,
+    unit: 'g',
+    distribution: 'NORMAL_K2',
+    sensitivityCoefficient: 1.0,
+    notes: 'Sijil kalibrasi NMIM/SAMM k=2. Had ketepatan 0.01 mg - 220 g.',
+  },
+  {
+    id: 'eq-pip-01',
+    name: 'Mikropipet Gilson Pipetman Classic 100-1000 µL',
+    category: 'PIPETTE',
+    code: 'EQ-PIP-01',
+    certificateNo: 'CAL-2026-PIP-118',
+    calibrationDate: '2026-03-10',
+    nextCalibrationDate: '2026-09-09',
+    statedUncertainty: 0.001,
+    unit: 'mL',
+    distribution: 'RECTANGULAR',
+    sensitivityCoefficient: 1.0,
+    notes: 'Toleransi pengeluar mengikut spesifikasi ISO 8655-2.',
+  },
+  {
+    id: 'eq-flk-01',
+    name: 'Kelalang Volumetrik Kaca Borosilikat Kelas A 100 mL',
+    category: 'FLASK',
+    code: 'GL-FLK-100A',
+    certificateNo: 'CERT-BORO-2025-09',
+    calibrationDate: '2025-06-20',
+    nextCalibrationDate: '2028-06-19',
+    statedUncertainty: 0.0008,
+    unit: 'mL',
+    distribution: 'TRIANGULAR',
+    sensitivityCoefficient: 1.0,
+    notes: 'Toleransi volumetrik ±0.10 mL pada 20°C, kesan suhu ±3°C (taburan segi tiga).',
+  },
+  {
+    id: 'eq-bur-01',
+    name: 'Buret Kaca Kelas A 50 mL dengan Kunci PTFE',
+    category: 'BURETTE',
+    code: 'GL-BUR-50A',
+    certificateNo: 'ISO-385-BUR-44',
+    calibrationDate: '2025-08-12',
+    nextCalibrationDate: '2028-08-11',
+    statedUncertainty: 0.05,
+    unit: 'mL',
+    distribution: 'TRIANGULAR',
+    sensitivityCoefficient: 1.0,
+    notes: 'Piawaian ISO 385. Had ralat maksima ±0.05 mL.',
+  },
+  {
+    id: 'eq-crm-01',
+    name: 'Bahan Rujukan Disahkan (CRM Lead / Plumbum 1000 mg/L)',
+    category: 'CRM',
+    code: 'CRM-PB-1000',
+    certificateNo: 'NIST-SRM-3128',
+    calibrationDate: '2025-11-01',
+    nextCalibrationDate: '2027-10-31',
+    statedUncertainty: 0.0004,
+    unit: 'mg/L',
+    distribution: 'NORMAL_K2',
+    sensitivityCoefficient: 1.0,
+    notes: 'Sijil NIST SRM dengan ketakpastian diperluas k=2 (95% CL).',
+  },
+  {
+    id: 'eq-thm-01',
+    name: 'Termo-higrometer Digital Fluke 971 (Bilik Instrumen)',
+    category: 'THERMOMETER',
+    code: 'EQ-THM-03',
+    certificateNo: 'CAL-ENV-2026-004',
+    calibrationDate: '2026-02-05',
+    nextCalibrationDate: '2027-02-04',
+    statedUncertainty: 0.5,
+    unit: '°C',
+    distribution: 'RECTANGULAR',
+    sensitivityCoefficient: 1.0,
+    notes: 'Pemantauan suhu persekitaran makmal (20 ± 2°C).',
+  },
+];
+
+export function loadEquipmentList(): import('../types/labmu').EquipmentItem[] {
+  try {
+    const raw = localStorage.getItem(EQUIPMENT_STORAGE_KEY);
+    if (!raw) {
+      saveEquipmentList(DEFAULT_EQUIPMENT_LIST);
+      return DEFAULT_EQUIPMENT_LIST;
+    }
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed;
+    }
+    saveEquipmentList(DEFAULT_EQUIPMENT_LIST);
+    return DEFAULT_EQUIPMENT_LIST;
+  } catch (err) {
+    console.error('Error loading equipment, defaulting:', err);
+    saveEquipmentList(DEFAULT_EQUIPMENT_LIST);
+    return DEFAULT_EQUIPMENT_LIST;
+  }
+}
+
+export function saveEquipmentList(items: import('../types/labmu').EquipmentItem[]): void {
+  try {
+    localStorage.setItem(EQUIPMENT_STORAGE_KEY, JSON.stringify(items));
+  } catch (err) {
+    console.error('Failed to save equipment list:', err);
+  }
+}

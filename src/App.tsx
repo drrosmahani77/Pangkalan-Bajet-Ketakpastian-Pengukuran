@@ -23,6 +23,7 @@ import { BudgetBuilder } from './components/BudgetBuilder';
 import { PrintReport } from './components/PrintReport';
 import { RejectModal } from './components/RejectModal';
 import { TemplateModal } from './components/TemplateModal';
+import { EquipmentLibraryModal } from './components/EquipmentLibraryModal';
 
 type ActiveView = 'DASHBOARD' | 'BUILDER' | 'PRINT';
 
@@ -35,6 +36,7 @@ export default function App() {
   // Modals
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [isGlobalEquipmentModalOpen, setIsGlobalEquipmentModalOpen] = useState(false);
   const [rejectingBudget, setRejectingBudget] = useState<UncertaintyBudget | null>(null);
 
   // Initialize budgets from localStorage
@@ -349,6 +351,7 @@ export default function App() {
           setActiveView('DASHBOARD');
           setSelectedBudget(null);
         }}
+        onOpenEquipmentLibrary={() => setIsGlobalEquipmentModalOpen(true)}
         activeViewTitle={
           activeView === 'BUILDER' && selectedBudget
             ? `${selectedBudget.testCode} · ${selectedBudget.testName}`
@@ -383,6 +386,7 @@ export default function App() {
         {activeView === 'BUILDER' && selectedBudget && (
           <BudgetBuilder
             budget={selectedBudget}
+            allBudgets={budgets}
             currentRole={currentRole}
             onSaveDraft={handleSaveDraft}
             onSubmitForReview={handleSubmitForReview}
@@ -414,6 +418,17 @@ export default function App() {
         isOpen={isTemplateModalOpen}
         onClose={() => setIsTemplateModalOpen(false)}
         onSelectTemplate={handleSelectTemplate}
+      />
+
+      {/* Global Equipment Registry Modal */}
+      <EquipmentLibraryModal
+        isOpen={isGlobalEquipmentModalOpen}
+        onClose={() => setIsGlobalEquipmentModalOpen(false)}
+        currentUnit="unit"
+        onSelectEquipment={() => {
+          setIsGlobalEquipmentModalOpen(false);
+          alert('Instrumen dipilih. Untuk memasukkan ke dalam sesuatu kaedah pengujian, buka bajet berkenaan di Penyunting Bajet.');
+        }}
       />
 
       {/* Rejection Modal for Manager */}

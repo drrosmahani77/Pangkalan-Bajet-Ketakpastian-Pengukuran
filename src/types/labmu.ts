@@ -20,6 +20,22 @@ export interface TypeBComponent {
   sensitivityCoefficient: number; // ci (default 1.0)
   standardUncertainty: number; // ui = (value / divisor) * ci
   varianceContribution?: number; // %
+  equipmentId?: string; // Link to shared equipment library if applicable
+}
+
+export interface EquipmentItem {
+  id: string;
+  name: string;
+  category: 'BALANCE' | 'PIPETTE' | 'FLASK' | 'CRM' | 'THERMOMETER' | 'BURETTE' | 'OTHER';
+  code: string; // e.g. "EQ-BAL-01", "CAL-2026-088"
+  certificateNo: string;
+  calibrationDate: string;
+  nextCalibrationDate: string;
+  statedUncertainty: number;
+  unit: string;
+  distribution: DistributionType;
+  sensitivityCoefficient: number;
+  notes?: string;
 }
 
 export interface TypeAData {

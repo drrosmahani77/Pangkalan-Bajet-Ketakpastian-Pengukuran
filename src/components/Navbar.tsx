@@ -7,7 +7,8 @@ import {
   RotateCcw,
   User,
   ShieldCheck,
-  ChevronRight
+  ChevronRight,
+  Wrench
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -17,6 +18,7 @@ interface NavbarProps {
   onBudgetsUpdate: (budgets: UncertaintyBudget[]) => void;
   onResetDemo: () => void;
   onNavigateHome: () => void;
+  onOpenEquipmentLibrary?: () => void;
   activeViewTitle?: string;
 }
 
@@ -27,6 +29,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onBudgetsUpdate,
   onResetDemo,
   onNavigateHome,
+  onOpenEquipmentLibrary,
   activeViewTitle,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -88,6 +91,19 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Zone 2 & 3: Role Switcher & Utilities */}
         <div className="flex items-center gap-2 sm:gap-3">
           
+          {/* Equipment Registry Button */}
+          {onOpenEquipmentLibrary && (
+            <button
+              type="button"
+              onClick={onOpenEquipmentLibrary}
+              title="Pustaka Peralatan Makmal & Sijil Kalibrasi"
+              className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-800 transition-colors"
+            >
+              <Wrench className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Pustaka Radas</span>
+            </button>
+          )}
+
           {/* FR-001: Role Switcher (Segmented Control without candy pills) */}
           <div className="flex items-center bg-slate-950/80 p-0.5 rounded-lg border border-slate-800 text-xs">
             <button

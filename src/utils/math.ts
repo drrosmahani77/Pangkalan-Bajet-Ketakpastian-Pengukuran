@@ -288,3 +288,59 @@ export function formatReportedResult(mean: number | null, expandedU: number): st
   }
   return `± ${formatLabNumber(expandedU, 4)}`;
 }
+
+/**
+ * ISO/GUM Standard (JCGM 100:2008 & EURACHEM CITAC Guide CG4):
+ * 1. Expanded uncertainty U is quoted to at most two significant digits (2 sig figs).
+ * 2. The mean/reported value is rounded to the same decimal place as U.
+ */
+export function formatIsoSignificantFigures(
+  mean: number | null,
+  expandedU: number,
+  unit: string = '',
+  k: number = 2
+): {
+  reported: string;
+  roundedMean: string;
+  roundedU: string;
+  decimalPlaces: number;
+  explanation: string;
+} {
+  if (expandedU <= 0 || isNaN(expandedU)) {
+    return {
+      reported: mean !== null ? `${mean.toFixed(4)} ${unit}` : '0.0000',
+      roundedMean: mean !== null ? mean.toFixed(4) : '0.0000',
+      roundedU: '0.0000',
+      decimalPlaces: 4,
+      explanation: 'Tiada ketakpastian bernilai positif untuk pembundaran 2 angka bererti.',
+    };
+  }
+
+  // Find the order of magnitude of expandedU
+  // e.g. for U = 0.0945 -> order is -2 (since 10^-2 = 0.01)
+  const order = Math.floor(Math.log10(expandedU));
+  // Round U to 2 significant digits:
+  // decimal places needed = -(order - 1)
+  const decimalPlaces = Math.max(0, 1 - order);
+
+  const roundedU = Number(expandedU.toFixed(decimalPlaces));
+  const roundedUStr = roundedU.toFixed(decimalPlaces);
+
+  let roundedMeanStr = '-';
+  if (mean !== null && !isNaN(mean)) {
+    roundedMeanStr = mean.toFixed(decimalPlaces);
+  }
+
+  const unitSuffix = unit ? ` ${unit}` : '';
+  const reported = mean !== null && !isNaN(mean)
+    ? `${roundedMeanStr} ± ${roundedUStr}${unitSuffix} (k=${k}, 95% CL)`
+    : `± ${roundedUStr}${unitSuffix} (k=${k}, 95% CL)`;
+
+  return {
+    reported,
+    roundedMean: roundedMeanStr,
+    roundedU: roundedUStr,
+    decimalPlaces,
+    explanation: `Mengikut klausa ISO/GUM 7.2.6, nilai ketakpastian diperluas U dibundarkan kepada 2 angka bererti (${roundedUStr}), dan min diselaraskan kepada ${decimalPlaces} tempat perpuluhan yang sama (${roundedMeanStr}).`,
+  };
+}
