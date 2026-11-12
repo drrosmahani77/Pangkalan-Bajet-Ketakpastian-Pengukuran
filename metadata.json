@@ -1,0 +1,8 @@
+{
+  "name": "Remix LabMU Pro",
+  "description": "Sistem Anggaran Ketakpastian Pengukuran Makmal Berasaskan Web (ISO/IEC 17025)",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
