@@ -8,8 +8,10 @@ import {
   User,
   ShieldCheck,
   ChevronRight,
-  Wrench
+  Wrench,
+  Globe
 } from 'lucide-react';
+import { useLanguage } from '../utils/i18n';
 
 interface NavbarProps {
   currentRole: UserRole;
@@ -32,6 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenEquipmentLibrary,
   activeViewTitle,
 }) => {
+  const { t, language, setLanguage } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleExport = () => {
@@ -49,9 +52,9 @@ export const Navbar: React.FC<NavbarProps> = ({
         const result = importBudgetsFromJSON(content);
         if (result.success && result.data) {
           onBudgetsUpdate(result.data);
-          alert(`Berjaya memulihkan ${result.data.length} rekod bajet ketakpastian.`);
+          alert(t('backupSuccess', { n: result.data.length }));
         } else {
-          alert(`Ralat pemulihan: ${result.error || 'Format fail tidak sah'}`);
+          alert(`${t('backupError')}: ${result.error || 'Format tidak sah'}`);
         }
       }
     };
@@ -59,6 +62,10 @@ export const Navbar: React.FC<NavbarProps> = ({
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+  };
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'ms' ? 'en' : 'ms');
   };
 
   return (
@@ -76,7 +83,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               LabMU <span className="text-sky-400 font-semibold">Pro</span>
             </span>
             <span className="hidden sm:inline text-xs text-slate-400 font-normal">
-              / ISO/IEC 17025
+              {t('navBrandSub')}
             </span>
           </button>
 
@@ -88,9 +95,20 @@ export const Navbar: React.FC<NavbarProps> = ({
           )}
         </div>
 
-        {/* Zone 2 & 3: Role Switcher & Utilities */}
+        {/* Zone 2 & 3: Role Switcher, Language Toggle & Utilities */}
         <div className="flex items-center gap-2 sm:gap-3">
           
+          {/* Language Switcher Button (BM <-> EN) */}
+          <button
+            type="button"
+            onClick={toggleLanguage}
+            title={language === 'ms' ? 'Tukar ke Bahasa Inggeris (Switch to English)' : 'Tukar ke Bahasa Melayu (Switch to Malay)'}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-sky-400 border border-slate-700 transition-all shadow-2xs"
+          >
+            <Globe className="w-3.5 h-3.5 text-sky-300" />
+            <span className="tracking-wide">{language === 'ms' ? 'EN' : 'BM'}</span>
+          </button>
+
           {/* Equipment Registry Button */}
           {onOpenEquipmentLibrary && (
             <button
@@ -100,11 +118,11 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-800 transition-colors"
             >
               <Wrench className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Pustaka Radas</span>
+              <span>{t('equipmentLibNav')}</span>
             </button>
           )}
 
-          {/* FR-001: Role Switcher (Segmented Control without candy pills) */}
+          {/* FR-001: Role Switcher */}
           <div className="flex items-center bg-slate-950/80 p-0.5 rounded-lg border border-slate-800 text-xs">
             <button
               type="button"
@@ -114,10 +132,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                   ? 'bg-slate-800 text-sky-400 shadow-2xs font-semibold'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
-              title="Peranan Analyst: Penyediaan draf & input data ujian (Ahmad)"
+              title="Peranan Analyst (Ahmad)"
             >
               <User className="w-3.5 h-3.5" />
-              <span>Analyst</span>
+              <span>{t('roleAnalyst')}</span>
             </button>
 
             <button
@@ -128,10 +146,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                   ? 'bg-slate-800 text-amber-400 shadow-2xs font-semibold'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
-              title="Peranan Manager: Semakan, kelulusan & cetakan rasmi (Dr. Siti)"
+              title="Peranan Manager (Dr. Siti)"
             >
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Manager</span>
+              <span>{t('roleManager')}</span>
             </button>
           </div>
 
@@ -139,19 +157,19 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex items-center gap-1 pl-2 border-l border-slate-800">
             <button
               onClick={handleExport}
-              title="Eksport Pangkalan Data (Sandaran JSON)"
+              title="Eksport Pangkalan Data"
               className="px-2.5 py-1 rounded-md text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-800 transition-colors flex items-center gap-1"
             >
               <Download className="w-3.5 h-3.5 text-slate-400" />
-              <span className="hidden sm:inline">Sandaran</span>
+              <span className="hidden sm:inline">{t('backup')}</span>
             </button>
 
             <label
-              title="Pulihkan Data daripada fail JSON"
+              title="Pulihkan Data"
               className="px-2.5 py-1 rounded-md text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 border border-slate-800 transition-colors flex items-center gap-1 cursor-pointer"
             >
               <Upload className="w-3.5 h-3.5 text-slate-400" />
-              <span className="hidden sm:inline">Pulihkan</span>
+              <span className="hidden sm:inline">{t('restore')}</span>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -163,7 +181,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <button
               onClick={onResetDemo}
-              title="Set Semula ke Data Contoh Makmal"
+              title="Set Semula"
               className="p-1 rounded-md text-slate-400 hover:text-rose-400 hover:bg-slate-800 border border-slate-800 transition-colors"
             >
               <RotateCcw className="w-3.5 h-3.5" />

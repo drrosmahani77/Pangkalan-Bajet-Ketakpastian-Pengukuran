@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   GitBranch
 } from 'lucide-react';
+import { useLanguage } from '../utils/i18n';
 
 interface DashboardProps {
   budgets: UncertaintyBudget[];
@@ -36,6 +37,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onDeleteBudget,
   onPrintBudget,
 }) => {
+  const { t, language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
@@ -65,28 +67,28 @@ export const Dashboard: React.FC<DashboardProps> = ({
     });
   }, [budgets, searchQuery, selectedCategory, selectedStatus]);
 
-  // Status Representation (Zero-Pill: Clean unboxed text with semantic glyph)
+  // Status Representation
   const renderStatus = (status: BudgetStatus) => {
     switch (status) {
       case 'APPROVED':
         return (
           <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-            Diluluskan
+            {t('statusApproved')}
           </span>
         );
       case 'SUBMITTED':
         return (
           <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-            Menunggu Semakan
+            {t('statusSubmitted')}
           </span>
         );
       case 'REJECTED':
         return (
           <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700">
             <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-            Perlu Pembetulan
+            {t('statusRejected')}
           </span>
         );
       case 'DRAFT':
@@ -94,7 +96,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         return (
           <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500">
             <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-            Draf
+            {t('statusDraft')}
           </span>
         );
     }
@@ -107,10 +109,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900">
-            Pangkalan Bajet Ketakpastian Pengukuran
+            {t('dashTitle')}
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Sistem pengurusan & verifikasi ketakpastian ISO/IEC 17025 Klausa 7.6 • Mod Aktif: <strong className={currentRole === 'ANALYST' ? 'text-sky-600' : 'text-amber-600'}>{currentRole === 'ANALYST' ? 'Analyst (Ahmad)' : 'Technical Manager (Dr. Siti)'}</strong>
+            {t('dashSubtitle')} • {t('activeMode')}: <strong className={currentRole === 'ANALYST' ? 'text-sky-600' : 'text-amber-600'}>{currentRole === 'ANALYST' ? t('analystName') : t('managerName')}</strong>
           </p>
         </div>
 
@@ -122,7 +124,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 border border-slate-300 rounded-lg shadow-2xs transition-colors"
           >
             <Sparkles className="w-3.5 h-3.5 text-slate-500" />
-            <span>Templat Pratetap</span>
+            <span>{t('presetTemplates')}</span>
           </button>
 
           {currentRole === 'ANALYST' && (
@@ -132,7 +134,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg shadow-2xs transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Bina Bajet Baharu</span>
+              <span>{t('createNewBudget')}</span>
             </button>
           )}
         </div>
@@ -144,27 +146,27 @@ export const Dashboard: React.FC<DashboardProps> = ({
         {/* Total */}
         <div className="p-4">
           <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider block">
-            Jumlah Rekod Bajet
+            {t('totalBudgets')}
           </span>
           <div className="mt-1 flex items-baseline gap-2">
             <span className="text-2xl font-bold font-mono tabular-nums text-slate-900">
               {metrics.total}
             </span>
-            <span className="text-xs text-slate-400">kaedah</span>
+            <span className="text-xs text-slate-400">{t('methodsCount')}</span>
           </div>
         </div>
 
         {/* Pending Review */}
         <div className="p-4 bg-amber-50/20">
           <span className="text-[11px] font-medium text-amber-800 uppercase tracking-wider block">
-            Menunggu Kelulusan
+            {t('pendingReview')}
           </span>
           <div className="mt-1 flex items-baseline gap-2">
             <span className="text-2xl font-bold font-mono tabular-nums text-amber-700">
               {metrics.submitted}
             </span>
             <span className="text-xs text-amber-600/70">
-              {currentRole === 'MANAGER' ? 'perlu tindakan' : 'dalam semakan'}
+              {currentRole === 'MANAGER' ? t('actionRequired') : t('inReview')}
             </span>
           </div>
         </div>
@@ -172,26 +174,26 @@ export const Dashboard: React.FC<DashboardProps> = ({
         {/* Approved */}
         <div className="p-4 bg-emerald-50/20">
           <span className="text-[11px] font-medium text-emerald-800 uppercase tracking-wider block">
-            Diluluskan (Audit Lock)
+            {t('approvedLock')}
           </span>
           <div className="mt-1 flex items-baseline gap-2">
             <span className="text-2xl font-bold font-mono tabular-nums text-emerald-700">
               {metrics.approved}
             </span>
-            <span className="text-xs text-emerald-600/70">sedia audit SAMM</span>
+            <span className="text-xs text-emerald-600/70">{t('readyAudit')}</span>
           </div>
         </div>
 
         {/* Draft / Revision */}
         <div className="p-4">
           <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider block">
-            Draf / Pembetulan
+            {t('draftOrRevision')}
           </span>
           <div className="mt-1 flex items-baseline gap-2">
             <span className="text-2xl font-bold font-mono tabular-nums text-slate-700">
               {metrics.draftOrRejected}
             </span>
-            <span className="text-xs text-slate-400">belum muktamad</span>
+            <span className="text-xs text-slate-400">{t('notFinalized')}</span>
           </div>
         </div>
 
@@ -207,7 +209,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cari mengikut kod SOP, nama ujian, atau matriks..."
+            placeholder={t('searchPlaceholder')}
             className="w-full pl-9 pr-3 py-1.5 text-xs text-slate-800 placeholder:text-slate-400 rounded-md border border-slate-200 focus:outline-hidden focus:border-slate-400 focus:ring-1 focus:ring-slate-400"
           />
         </div>
@@ -216,16 +218,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 text-xs text-slate-500 shrink-0">
             <Filter className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Kategori:</span>
+            <span className="hidden sm:inline">{t('categoryFilter')}</span>
           </div>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="text-xs bg-slate-50 border border-slate-200 rounded-md px-2 py-1.5 text-slate-700 focus:outline-hidden focus:border-slate-400"
           >
-            <option value="ALL">Semua Kategori</option>
-            <option value="CHEMICAL">Kimia (EURACHEM)</option>
-            <option value="BIOLOGICAL">Biologi (ISO 19036)</option>
+            <option value="ALL">{t('allCategories')}</option>
+            <option value="CHEMICAL">{t('chemEurachem')}</option>
+            <option value="BIOLOGICAL">{t('bioIso')}</option>
           </select>
 
           <select
@@ -233,11 +235,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
             onChange={(e) => setSelectedStatus(e.target.value)}
             className="text-xs bg-slate-50 border border-slate-200 rounded-md px-2 py-1.5 text-slate-700 focus:outline-hidden focus:border-slate-400"
           >
-            <option value="ALL">Semua Status</option>
-            <option value="DRAFT">Draf</option>
-            <option value="SUBMITTED">Menunggu Kelulusan</option>
-            <option value="APPROVED">Diluluskan</option>
-            <option value="REJECTED">Perlu Pembetulan</option>
+            <option value="ALL">{t('allStatuses')}</option>
+            <option value="DRAFT">{t('statusDraft')}</option>
+            <option value="SUBMITTED">{t('statusSubmitted')}</option>
+            <option value="APPROVED">{t('statusApproved')}</option>
+            <option value="REJECTED">{t('statusRejected')}</option>
           </select>
         </div>
 
@@ -249,20 +251,20 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold text-[11px] uppercase tracking-wider">
-                <th className="py-2.5 px-4 w-48">Kod SOP / Kaedah</th>
-                <th className="py-2.5 px-4">Nama Parameter Pengujian</th>
-                <th className="py-2.5 px-4 w-40">Kategori & Matriks</th>
-                <th className="py-2.5 px-4 w-44">Ketakpastian Diperluas (U)</th>
-                <th className="py-2.5 px-4 w-40">Status Rekod</th>
-                <th className="py-2.5 px-4 text-right w-44">Tindakan</th>
+                <th className="py-2.5 px-4 w-48">{t('colSopCode')}</th>
+                <th className="py-2.5 px-4">{t('colParameter')}</th>
+                <th className="py-2.5 px-4 w-40">{t('colCategoryMatrix')}</th>
+                <th className="py-2.5 px-4 w-44">{t('colExpandedU')}</th>
+                <th className="py-2.5 px-4 w-40">{t('colStatus')}</th>
+                <th className="py-2.5 px-4 text-right w-44">{t('colActions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredBudgets.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-12 text-center text-slate-400">
-                    <p className="text-sm font-medium">Tiada rekod bajet dijumpai.</p>
-                    <p className="text-xs mt-0.5">Sila semak penapis carian atau gunakan Templat Pratetap.</p>
+                    <p className="text-sm font-medium">{t('noRecordsFound')}</p>
+                    <p className="text-xs mt-0.5">{t('noRecordsHint')}</p>
                   </td>
                 </tr>
               ) : (
@@ -290,7 +292,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         {item.parentRecordId && (
                           <div className="flex items-center gap-1 text-[10px] text-sky-700 mt-0.5">
                             <GitBranch className="w-3 h-3 text-sky-500" />
-                            <span>Klon daripada v{(parseFloat(item.version) - 1.0 > 0 ? (parseFloat(item.version) - 1.0) : 1.0).toFixed(1)}</span>
+                            <span>{t('clonedFrom')} v{(parseFloat(item.version) - 1.0 > 0 ? (parseFloat(item.version) - 1.0) : 1.0).toFixed(1)}</span>
                           </div>
                         )}
                       </td>
@@ -304,7 +306,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                           {item.testName}
                         </div>
                         <div className="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1.5">
-                          <span>Disediakan: {item.preparedBy}</span>
+                          <span>{t('preparedBy')}: {item.preparedBy}</span>
                           <span aria-hidden="true">·</span>
                           <span className="font-mono">{item.preparedDate}</span>
                         </div>
@@ -313,7 +315,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       {/* Category & Matrix */}
                       <td className="py-3 px-4 align-top">
                         <div className="text-xs text-slate-700 font-medium">
-                          {item.category === 'CHEMICAL' ? 'Kimia (EURACHEM)' : 'Biologi (ISO 19036)'}
+                          {item.category === 'CHEMICAL' ? t('chemEurachem') : t('bioIso')}
                         </div>
                         <div className="text-[11px] text-slate-500">
                           {item.matrix}
@@ -335,7 +337,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         <div>{renderStatus(item.status)}</div>
                         {isApproved && item.approvedBy && (
                           <div className="text-[10px] text-slate-500 mt-0.5">
-                            Oleh: {item.approvedBy}
+                            {t('approvedBy')}: {item.approvedBy}
                           </div>
                         )}
                         {isRejected && item.rejectionReason && (
@@ -384,11 +386,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
                             }`}
                           >
                             {isSubmitted && currentRole === 'MANAGER' ? (
-                              'Semak'
+                              t('review')
                             ) : isApproved ? (
-                              'Papar'
+                              t('view')
                             ) : (
-                              'Sunting'
+                              t('edit')
                             )}
                           </button>
 
@@ -397,11 +399,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
                             <button
                               type="button"
                               onClick={() => {
-                                if (window.confirm(`Adakah anda pasti ingin memadam bajet [${item.testCode}]?`)) {
+                                if (window.confirm(t('deleteDraftConfirm', { code: item.testCode }))) {
                                   onDeleteBudget(item.id);
                                 }
                               }}
-                              title="Padam Draf"
+                              title={t('delete')}
                               className="p-1.5 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
                             >
                               <Trash2 className="w-3.5 h-3.5" />

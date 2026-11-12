@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { X, ClipboardPaste, Check, AlertCircle, FileSpreadsheet } from 'lucide-react';
 import { formatLabNumber } from '../utils/math';
+import { useLanguage } from '../utils/i18n';
 
 interface BatchPasteModalProps {
   isOpen: boolean;
@@ -19,8 +20,10 @@ export const BatchPasteModal: React.FC<BatchPasteModalProps> = ({
   unit,
   onApply,
 }) => {
+  const { t, language } = useLanguage();
   const [rawText, setRawText] = useState('');
   const [insertMode, setInsertMode] = useState<'REPLACE' | 'APPEND'>('REPLACE');
+  const isEn = language === 'en';
 
   // Parse pasted raw text into clean array of numbers
   const parsedData = useMemo(() => {
@@ -100,10 +103,10 @@ export const BatchPasteModal: React.FC<BatchPasteModalProps> = ({
             </div>
             <div>
               <h2 id="batch-paste-title" className="text-sm font-bold text-slate-900">
-                Tampal Pukal dari Excel / LIMS Makmal
+                {t('batchPasteTitle')}
               </h2>
               <p className="text-xs text-slate-500">
-                {targetType === 'TYPE_A' ? 'Bacaan Replikasi Type A' : 'Pengiraan Koloni Biologi (CFU)'} ({unit})
+                {targetType === 'TYPE_A' ? (isEn ? 'Type A Replicate Readings' : 'Bacaan Replikasi Type A') : (isEn ? 'Biological Colony Count (CFU)' : 'Pengiraan Koloni Biologi (CFU)')} ({unit})
               </p>
             </div>
           </div>
@@ -121,21 +124,21 @@ export const BatchPasteModal: React.FC<BatchPasteModalProps> = ({
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="font-semibold text-slate-700">
-                Tampal lajur data (Excel / CSV / teks berjarak):
+                {t('pasteAreaLabel')}
               </label>
               <button
                 type="button"
                 onClick={handlePasteDemo}
                 className="text-[11px] text-sky-600 hover:text-sky-800 underline font-medium"
               >
-                Cuba Contoh Data
+                {t('tryDemoData')}
               </button>
             </div>
             <textarea
               rows={5}
               value={rawText}
               onChange={(e) => setRawText(e.target.value)}
-              placeholder="Contoh salin dari Excel:&#10;10.15&#10;10.22&#10;10.18&#10;10.20"
+              placeholder={isEn ? "Paste from Excel example:\n10.15\n10.22\n10.18\n10.20" : "Contoh salin dari Excel:\n10.15\n10.22\n10.18\n10.20"}
               className="w-full font-mono text-xs p-3 rounded-lg border border-slate-300 focus:outline-hidden focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
             />
           </div>
@@ -155,26 +158,26 @@ export const BatchPasteModal: React.FC<BatchPasteModalProps> = ({
             <div className="bg-slate-50 rounded-xl border border-slate-200 p-3 space-y-2">
               <div className="flex items-center justify-between border-b border-slate-200/70 pb-1.5">
                 <span className="font-semibold text-slate-800">
-                  Pratonton Statistik ({stats.count} bacaan dikesan):
+                  {t('statsPreviewTitle', { n: stats.count })}
                 </span>
                 <span className="font-mono text-sky-700 font-bold">
-                  Min (x̄) = {formatLabNumber(stats.mean, 4)} {unit}
+                  {isEn ? 'Mean' : 'Min'} (x̄) = {formatLabNumber(stats.mean, 4)} {unit}
                 </span>
               </div>
               <div className="grid grid-cols-3 gap-2 font-mono text-[11px] text-slate-600">
-                <div>Minima: <strong>{stats.min}</strong></div>
-                <div>Maksima: <strong>{stats.max}</strong></div>
+                <div>{isEn ? 'Min' : 'Minima'}: <strong>{stats.min}</strong></div>
+                <div>{isEn ? 'Max' : 'Maksima'}: <strong>{stats.max}</strong></div>
                 <div>SD (s): <strong>{formatLabNumber(stats.sd, 4)}</strong></div>
               </div>
               <div className="text-[11px] font-mono text-slate-500 truncate pt-1">
-                Sampel: [{parsedData.numbers.slice(0, 8).join(', ')}{parsedData.numbers.length > 8 ? '...' : ''}]
+                {isEn ? 'Sample' : 'Sampel'}: [{parsedData.numbers.slice(0, 8).join(', ')}{parsedData.numbers.length > 8 ? '...' : ''}]
               </div>
             </div>
           )}
 
           {/* Mode Selection */}
           <div className="space-y-1.5 pt-1">
-            <span className="block font-semibold text-slate-700">Kaedah Kemasukan:</span>
+            <span className="block font-semibold text-slate-700">{isEn ? 'Insertion Method:' : 'Kaedah Kemasukan:'}</span>
             <div className="grid grid-cols-2 gap-2">
               <label 
                 className={`flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-colors ${
@@ -191,8 +194,8 @@ export const BatchPasteModal: React.FC<BatchPasteModalProps> = ({
                   className="text-sky-600"
                 />
                 <div>
-                  <div>Gantikan Semua</div>
-                  <div className="text-[10px] text-slate-500 font-normal">Padam {currentReadings.length} sedia ada</div>
+                  <div>{t('modeReplace')}</div>
+                  <div className="text-[10px] text-slate-500 font-normal">{t('modeReplaceDesc', { n: currentReadings.length })}</div>
                 </div>
               </label>
 
@@ -211,8 +214,8 @@ export const BatchPasteModal: React.FC<BatchPasteModalProps> = ({
                   className="text-sky-600"
                 />
                 <div>
-                  <div>Tambah (Append)</div>
-                  <div className="text-[10px] text-slate-500 font-normal">Gabungkan dengan {currentReadings.length} sedia ada</div>
+                  <div>{t('modeAppend')}</div>
+                  <div className="text-[10px] text-slate-500 font-normal">{t('modeAppendDesc', { n: currentReadings.length })}</div>
                 </div>
               </label>
             </div>
@@ -226,7 +229,7 @@ export const BatchPasteModal: React.FC<BatchPasteModalProps> = ({
             onClick={onClose}
             className="px-3.5 py-1.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 font-medium transition-colors"
           >
-            Batal
+            {t('cancel')}
           </button>
           <button
             type="button"
@@ -235,7 +238,7 @@ export const BatchPasteModal: React.FC<BatchPasteModalProps> = ({
             className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 disabled:opacity-40 transition-colors"
           >
             <Check className="w-3.5 h-3.5" />
-            <span>Sahkan & Masukkan ({parsedData.numbers.length} Nilai)</span>
+            <span>{t('confirmPaste', { n: parsedData.numbers.length })}</span>
           </button>
         </div>
       </div>

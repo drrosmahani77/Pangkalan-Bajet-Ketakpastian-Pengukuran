@@ -1,6 +1,7 @@
 import React from 'react';
 import { UncertaintyBudget } from '../types/labmu';
 import { formatLabNumber, getDistributionLabel } from '../utils/math';
+import { useLanguage } from '../utils/i18n';
 import { ArrowLeft, Printer, ShieldCheck, FlaskConical } from 'lucide-react';
 
 interface PrintReportProps {
@@ -9,6 +10,8 @@ interface PrintReportProps {
 }
 
 export const PrintReport: React.FC<PrintReportProps> = ({ budget, onBack }) => {
+  const { t, language } = useLanguage();
+  const isEn = language === 'en';
   const isApproved = budget.status === 'APPROVED';
   const isChemical = budget.category === 'CHEMICAL';
 
@@ -27,12 +30,12 @@ export const PrintReport: React.FC<PrintReportProps> = ({ budget, onBack }) => {
           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Kembali ke Editor</span>
+          <span>{isEn ? 'Back to Editor' : 'Kembali ke Editor'}</span>
         </button>
 
         <div className="flex items-center gap-3">
           <span className="text-xs text-slate-500 hidden sm:inline">
-            Susun atur sedia untuk cetakan format A4 atau simpanan fail PDF.
+            {isEn ? 'Layout formatted for standard A4 printing or PDF export.' : 'Susun atur sedia untuk cetakan format A4 atau simpanan fail PDF.'}
           </span>
           <button
             type="button"
@@ -40,7 +43,7 @@ export const PrintReport: React.FC<PrintReportProps> = ({ budget, onBack }) => {
             className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white rounded-md shadow-2xs transition-colors"
           >
             <Printer className="w-3.5 h-3.5" />
-            <span>Cetak / Eksport PDF</span>
+            <span>{t('btnExportPdf')}</span>
           </button>
         </div>
       </div>

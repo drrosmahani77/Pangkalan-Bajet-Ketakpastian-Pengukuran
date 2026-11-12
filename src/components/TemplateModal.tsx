@@ -1,5 +1,6 @@
 import React from 'react';
 import { STARTER_TEMPLATES } from '../utils/storage';
+import { useLanguage } from '../utils/i18n';
 import { X, ArrowRight } from 'lucide-react';
 
 interface TemplateModalProps {
@@ -13,6 +14,9 @@ export const TemplateModal: React.FC<TemplateModalProps> = ({
   onClose,
   onSelectTemplate,
 }) => {
+  const { t, language } = useLanguage();
+  const isEn = language === 'en';
+
   if (!isOpen) return null;
 
   return (
@@ -23,10 +27,10 @@ export const TemplateModal: React.FC<TemplateModalProps> = ({
         <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
           <div>
             <h2 className="font-bold text-slate-900 text-sm">
-              Pilih Templat Pratetap Kaedah Makmal
+              {isEn ? 'Select Preset Laboratory Template' : 'Pilih Templat Pratetap Kaedah Makmal'}
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              Muatkan konfigurasi bajet piawai untuk mempercepat penyediaan (&lt;15 minit).
+              {isEn ? 'Load standard uncertainty budget configuration (<15 min workflow).' : 'Muatkan konfigurasi bajet piawai untuk mempercepat penyediaan (<15 minit).'}
             </p>
           </div>
           <button
@@ -52,7 +56,7 @@ export const TemplateModal: React.FC<TemplateModalProps> = ({
                     <span className="font-bold text-slate-900">{tpl.testCode}</span>
                     <span aria-hidden="true">·</span>
                     <span className="text-slate-600 font-sans font-medium">
-                      {isChemical ? 'Kimia (EURACHEM)' : 'Biologi (ISO 19036)'}
+                      {isChemical ? (isEn ? 'Chemical (EURACHEM)' : 'Kimia (EURACHEM)') : (isEn ? 'Biological (ISO 19036)' : 'Biologi (ISO 19036)')}
                     </span>
                     <span aria-hidden="true">·</span>
                     <span>{tpl.unit}</span>
@@ -63,13 +67,13 @@ export const TemplateModal: React.FC<TemplateModalProps> = ({
                   </h3>
 
                   <p className="text-[11px] text-slate-500 line-clamp-1">
-                    Matriks: <span className="text-slate-700">{tpl.matrix}</span> — "{tpl.notes}"
+                    {isEn ? 'Matrix' : 'Matriks'}: <span className="text-slate-700">{tpl.matrix}</span> — "{tpl.notes}"
                   </p>
                 </div>
 
                 <div className="self-end sm:self-center shrink-0">
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-700 bg-slate-100 group-hover:bg-slate-900 group-hover:text-white rounded border border-slate-200 group-hover:border-slate-900 transition-colors">
-                    Pilih
+                    {isEn ? 'Select' : 'Pilih'}
                     <ArrowRight className="w-3 h-3" />
                   </span>
                 </div>
@@ -85,7 +89,7 @@ export const TemplateModal: React.FC<TemplateModalProps> = ({
             onClick={onClose}
             className="px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded transition-colors"
           >
-            Tutup
+            {t('close')}
           </button>
         </div>
 

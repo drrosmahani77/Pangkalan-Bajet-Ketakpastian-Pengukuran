@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { EquipmentItem, TypeBComponent, DistributionType } from '../types/labmu';
 import { loadEquipmentList, saveEquipmentList } from '../utils/storage';
 import { getDistributionDivisor, formatLabNumber } from '../utils/math';
+import { useLanguage } from '../utils/i18n';
 import { 
   X, 
   Wrench, 
@@ -27,10 +28,12 @@ export const EquipmentLibraryModal: React.FC<EquipmentLibraryModalProps> = ({
   onSelectEquipment,
   currentUnit,
 }) => {
+  const { t, language } = useLanguage();
   const [equipmentList, setEquipmentList] = useState<EquipmentItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const isEn = language === 'en';
 
   // Form state for adding custom equipment
   const [newName, setNewName] = useState('');
@@ -135,10 +138,10 @@ export const EquipmentLibraryModal: React.FC<EquipmentLibraryModalProps> = ({
             </div>
             <div>
               <h2 id="equipment-library-title" className="text-base font-bold text-slate-900">
-                Pustaka Peralatan & Sijil Kalibrasi Makmal
+                {t('eqLibTitle')}
               </h2>
               <p className="text-xs text-slate-500">
-                Pilih radas yang telah ditentukur untuk disuntik terus ke dalam Komponen Type B.
+                {t('eqLibSubtitle')}
               </p>
             </div>
           </div>
@@ -161,7 +164,7 @@ export const EquipmentLibraryModal: React.FC<EquipmentLibraryModalProps> = ({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari nama peralatan, kod aset (EQ-BAL-01), atau nombor sijil..."
+                placeholder={t('searchEqPlaceholder')}
                 className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-slate-300 text-xs focus:outline-hidden focus:border-indigo-500"
               />
             </div>
@@ -172,13 +175,13 @@ export const EquipmentLibraryModal: React.FC<EquipmentLibraryModalProps> = ({
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="text-xs rounded-lg border border-slate-300 px-2.5 py-1.5 bg-slate-50 text-slate-700 focus:outline-hidden focus:border-indigo-500"
             >
-              <option value="ALL">Semua Kategori</option>
-              <option value="BALANCE">Neraca Analitikal</option>
-              <option value="PIPETTE">Mikropipet</option>
-              <option value="FLASK">Kelalang Volumetrik</option>
-              <option value="BURETTE">Buret</option>
-              <option value="CRM">Bahan Standard (CRM)</option>
-              <option value="THERMOMETER">Suhu / Persekitaran</option>
+              <option value="ALL">{isEn ? 'All Categories' : 'Semua Kategori'}</option>
+              <option value="BALANCE">{isEn ? 'Analytical Balance' : 'Neraca Analitikal'}</option>
+              <option value="PIPETTE">{isEn ? 'Micropipette' : 'Mikropipet'}</option>
+              <option value="FLASK">{isEn ? 'Volumetric Flask' : 'Kelalang Volumetrik'}</option>
+              <option value="BURETTE">{isEn ? 'Burette' : 'Buret'}</option>
+              <option value="CRM">{isEn ? 'Reference Material (CRM)' : 'Bahan Standard (CRM)'}</option>
+              <option value="THERMOMETER">{isEn ? 'Temperature / Environment' : 'Suhu / Persekitaran'}</option>
             </select>
 
             <button
@@ -187,7 +190,7 @@ export const EquipmentLibraryModal: React.FC<EquipmentLibraryModalProps> = ({
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition-colors shrink-0"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Daftar Radas Baharu</span>
+              <span>{t('btnRegisterNewEq')}</span>
             </button>
           </div>
         )}
@@ -372,7 +375,7 @@ export const EquipmentLibraryModal: React.FC<EquipmentLibraryModalProps> = ({
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-semibold transition-colors text-xs"
                     >
                       <Check className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Suntik ke Bajet</span>
+                      <span>{t('btnInjectToBudget')}</span>
                     </button>
 
                     {item.id.startsWith('eq-custom') && (
@@ -380,7 +383,7 @@ export const EquipmentLibraryModal: React.FC<EquipmentLibraryModalProps> = ({
                         type="button"
                         onClick={() => handleDeleteEquipment(item.id, item.name)}
                         className="p-1.5 text-slate-400 hover:text-rose-600 rounded hover:bg-rose-50 transition-colors"
-                        title="Padam Instrumen"
+                        title={isEn ? "Delete Instrument" : "Padam Instrumen"}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -395,14 +398,14 @@ export const EquipmentLibraryModal: React.FC<EquipmentLibraryModalProps> = ({
         {/* Footer */}
         <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
           <span className="text-slate-500 text-[11px]">
-            {equipmentList.length} instrumen & bahan rujukan berdaftar dalam makmal
+            {isEn ? `${equipmentList.length} registered laboratory equipment & standards` : `${equipmentList.length} instrumen & bahan rujukan berdaftar dalam makmal`}
           </span>
           <button
             type="button"
             onClick={onClose}
             className="px-4 py-1.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 font-medium transition-colors"
           >
-            Tutup
+            {t('close')}
           </button>
         </div>
       </div>

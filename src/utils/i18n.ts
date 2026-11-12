@@ -1,0 +1,586 @@
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+
+export type Language = 'ms' | 'en';
+
+const LANGUAGE_KEY = 'labmu_pro_lang_preference';
+
+export const translations = {
+  ms: {
+    // Brand & General
+    appTitle: 'LabMU Pro',
+    appSubtitle: 'Sistem Anggaran Ketakpastian Pengukuran Makmal (ISO/IEC 17025)',
+    clause76: 'ISO/IEC 17025 Klausa 7.6',
+    activeMode: 'Mod Aktif',
+    analystName: 'Analyst (Ahmad)',
+    managerName: 'Technical Manager (Dr. Siti)',
+    close: 'Tutup',
+    cancel: 'Batal',
+    save: 'Simpan',
+    delete: 'Padam',
+    edit: 'Sunting',
+    review: 'Semak',
+    view: 'Papar',
+    clone: 'Klon',
+    print: 'Cetak',
+    back: 'Kembali',
+    confirm: 'Sahkan',
+    unit: 'Unit',
+    search: 'Cari',
+    all: 'Semua',
+
+    // Navbar
+    navBrandSub: '/ ISO/IEC 17025',
+    roleAnalyst: 'Analyst',
+    roleManager: 'Manager',
+    backup: 'Sandaran',
+    restore: 'Pulihkan',
+    resetDemo: 'Set Semula Contoh',
+    equipmentLibNav: 'Pustaka Radas',
+    langToggle: 'EN',
+    backupSuccess: 'Berjaya memulihkan {n} rekod bajet ketakpastian.',
+    backupError: 'Ralat pemulihan fail JSON.',
+    resetConfirm: 'Adakah anda pasti ingin menetapkan semula semua data ke set contoh makmal lalai?',
+
+    // Dashboard
+    dashTitle: 'Pangkalan Bajet Ketakpastian Pengukuran',
+    dashSubtitle: 'Sistem pengurusan & verifikasi ketakpastian ISO/IEC 17025 Klausa 7.6',
+    presetTemplates: 'Templat Pratetap',
+    createNewBudget: 'Bina Bajet Baharu',
+    totalBudgets: 'Jumlah Rekod Bajet',
+    methodsCount: 'kaedah',
+    pendingReview: 'Menunggu Kelulusan',
+    actionRequired: 'perlu tindakan',
+    inReview: 'dalam semakan',
+    approvedLock: 'Diluluskan (Audit Lock)',
+    readyAudit: 'sedia audit SAMM',
+    draftOrRevision: 'Draf / Pembetulan',
+    notFinalized: 'belum muktamad',
+    searchPlaceholder: 'Cari mengikut kod SOP, nama ujian, atau matriks...',
+    categoryFilter: 'Kategori:',
+    allCategories: 'Semua Kategori',
+    chemEurachem: 'Kimia (EURACHEM)',
+    bioIso: 'Biologi (ISO 19036)',
+    allStatuses: 'Semua Status',
+    statusDraft: 'Draf',
+    statusSubmitted: 'Menunggu Semakan',
+    statusApproved: 'Diluluskan',
+    statusRejected: 'Perlu Pembetulan',
+    colSopCode: 'Kod SOP / Kaedah',
+    colParameter: 'Nama Parameter Pengujian',
+    colCategoryMatrix: 'Kategori & Matriks',
+    colExpandedU: 'Ketakpastian Diperluas (U)',
+    colStatus: 'Status Rekod',
+    colActions: 'Tindakan',
+    noRecordsFound: 'Tiada rekod bajet dijumpai.',
+    noRecordsHint: 'Sila semak penapis carian atau gunakan Templat Pratetap.',
+    preparedBy: 'Disediakan',
+    approvedBy: 'Diluluskan oleh',
+    clonedFrom: 'Klon daripada',
+    deleteDraftConfirm: 'Adakah anda pasti ingin memadam bajet [{code}]?',
+
+    // Budget Builder
+    btnFormulaInspector: 'Pemeriksa Formula',
+    btnPrintA4: 'Laporan A4',
+    btnCloneVersion: 'Klon ke v{v}',
+    btnSaveDraft: 'Simpan Draf',
+    btnSubmitReview: 'Hantar Semakan',
+    btnReject: 'Tolak (Reject)',
+    btnApprove: 'Luluskan (Approve)',
+    auditLockNotice: 'Rekod Dikunci (Audit Lock Aktif):',
+    auditLockDesc: 'Diluluskan oleh {user} pada {date} mengikut ISO/IEC 17025. Suntingan langsung dimatikan.',
+    auditLockHint: 'Gunakan "Klon ke v{v}" untuk kalibrasi baharu.',
+    rejectionNoticeTitle: 'Ulasan Semakan Pengurus Kualiti:',
+    rejectionFixHint: 'Sila betulkan nilai di bawah, kemudian tekan butang "Hantar Semakan".',
+    acVerifierBar: 'Verifikasi Kriteria Penerimaan PRD:',
+    ac01Btn: 'Uji AC-01 (Type A)',
+    ac02Btn: 'Uji AC-02 (Type B)',
+    ac03Btn: 'Uji AC-03 (ISO 19036)',
+    autoSaved: 'Tersimpan Automatik',
+    autoSaving: 'Menyimpan...',
+    unsavedChanges: 'Ada perubahan draf',
+    unsavedWarning: 'Terdapat perubahan yang belum disimpan. Adakah anda ingin menyimpan perubahan ini sebelum kembali?',
+
+    // Builder Sections
+    sec1Title: '1. Maklumat Kaedah & Metadata Pengujian',
+    fieldName: 'Nama Kaedah / Parameter Pengujian',
+    fieldCode: 'Kod SOP Makmal',
+    fieldEngine: 'Kategori Enjin',
+    fieldMatrix: 'Matriks Sampel',
+    fieldUnit: 'Unit Pengukuran',
+    fieldNotes: 'Catatan Kaedah & Rujukan Standard',
+    notesPlaceholder: 'Contoh: Kaedah spektrometri ICP-MS mengikut piawaian APHA 3125 B',
+    optChem: 'Kimia',
+    optBio: 'Biologi',
+
+    sec2TitleChem: '2. Komponen Type A (Replikasi Siri Ujian)',
+    enableTypeA: 'Gunakan Type A',
+    batchPasteExcel: 'Tampal Pukal Excel',
+    readingPlaceholder: 'Nilai bacaan...',
+    btnAddReading: '+ Tambah',
+    repCount: 'Replikasi (n)',
+    needMinRep: 'Perlu n ≥ 2',
+    meanTest: 'Min Ujian (x̄)',
+    sdSample: 'Sisihan Piawai (s)',
+    uAStd: 'Ketakpastian uA',
+    typeADisabledMsg: 'Komponen Type A dimatikan. Hanya komponen Type B yang dimasukkan dalam bajet gabungan.',
+
+    sec3TitleChem: '3. Komponen Type B (Sijil Kalibrasi & Had Peralatan)',
+    equipmentLibBtn: 'Pustaka Peralatan Makmal',
+    colSource: 'Sumber Ketakpastian',
+    colValue: 'Nilai (±a)',
+    colDist: 'Taburan Kebarangkalian',
+    colDivisor: 'Pembahagi',
+    colCi: 'ci',
+    colUi: 'Ketakpastian (ui)',
+    colVarPct: 'Varians (%)',
+    noTypeBMsg: 'Tiada komponen Type B dimasukkan. Sila tambah baris atau pilih dari Pustaka Peralatan.',
+    btnAddTypeBRow: 'Tambah Baris Komponen Type B',
+    smartAdvisorTitle: 'Cadangan ISO/EURACHEM:',
+    useDistBtn: 'Guna {dist}',
+
+    sec2TitleBio: '2. Enjin Mikrobiologi Makanan (ISO 19036:2019)',
+    batchPasteCfu: 'Tampal Pukal CFU',
+    plateCountsLabel: 'Data Replikasi Koloni (CFU/g)',
+    plateNum: 'Piring #{n}',
+    addCfuBtn: '+ Tambah CFU',
+    cfuPlaceholder: 'Contoh: 2400',
+    sRLabel: 'sR (Reproducibility SD)',
+    sRHint: 'Kebolehulangan log10 CFU/g',
+    sRDesc: 'Kebolehulangan log10 CFU/g',
+    uMatLabel: 'uMat (Matrix Heterogeneity)',
+    uMatHint: 'Ketakpastian matriks sampel (0.01–0.05)',
+    uMatDesc: 'Ketakpastian matriks sampel (0.01–0.05)',
+    uIncLabel: 'uInc (Incubation Uncertainty)',
+    uIncHint: 'Variasi suhu pengeraman (0.01–0.02)',
+    uIncDesc: 'Variasi suhu pengeraman (0.01–0.02)',
+    lodWarning: 'Amaran Batas Pengesanan (LOD):',
+    lodWarningDesc: 'Bacaan koloni 0 CFU dikesan. Mengikut ISO 19036, sistem menggunakan pengesyoran batas pengesanan (<1 CFU atau proxy 1) bagi menjamin kesinambungan tanpa ralat matematik.',
+
+    // Sticky Rail
+    railTitle: 'Ringkasan Metrologi',
+    ucLabel: 'Ketakpastian Gabungan (u_c)',
+    uExpandedLabel: 'Ketakpastian Diperluas (U = 2 × u_c)',
+    relUncertainty: 'Ketakpastian Relatif:',
+    isoReportingStatement: 'Pelaporan ISO 17025:',
+    btnBreakdown: 'Pecahan Formula Lengkap',
+    btnSheetPreview: 'Pratonton Kanvas Laporan A4',
+    auditorHelp: 'Bantuan Pantas Auditor:',
+    btnToggleSigFigs: '2 Sig Figs',
+    btnToggleRaw: 'Nilai Penuh',
+
+    // Pareto Chart
+    paretoTitle: 'Analisis Pareto & Sumbangan Varians Ketakpastian (80/20 Rule)',
+    paretoSubtitle: 'Mengenal pasti sumber ralat utama yang mempengaruhi ketakpastian gabungan (u_c²).',
+    tabParetoChart: 'Carta Pareto',
+    tabCumTable: 'Jadual Kumulatif',
+    topContributorTag: 'Penyumbang Ralat Dominan ({pct}%):',
+    topContributorAdvice: '"{name}" merupakan punca ralat terbesar dalam kaedah ini. Untuk mengurangkan nilai U secara signifikan, fokus penambahbaikan perlu diberikan kepada komponen ini.',
+    pareto80RuleNote: 'Peraturan 80/20 ISO: Ralat makmal lazimnya dikuasai oleh 1 hingga 2 komponen utama.',
+    totalVarianceText: 'Jumlah Varians: 100.0%',
+    colRank: 'Kedudukan',
+    colVarianceUi2: 'u_i² (Varians)',
+    colCumulative: 'Kumulatif (%)',
+
+    // Audit Trail
+    auditTrailTitle: 'Jejak Audit & Sejarah Kelulusan (Audit Trail)',
+
+    // Formula Inspector
+    formulaInspectorTitle: 'Pemeriksa Formula Matematik Interaktif',
+    formulaInspectorSub: 'Pecahan langkah pengiraan bagi kaedah: {code} ({name})',
+    tabFlowOverview: 'Ringkasan Aliran Metrologi',
+    tabStep1TypeA: '1. Type A (u_A = s / √n)',
+    tabStep2TypeB: '2. Type B (u_i = (a / div) × c_i)',
+    tabStep3Combined: '3. Gabungan (u_c)',
+    tabStep4Expanded: '4. Diperluas (U = k × u_c)',
+    reportedStatementTitle: 'Kenyataan Pelaporan Laporan Makmal ISO 17025 (Klausa 7.8.3.1):',
+    closeInspector: 'Tutup Pemeriksa',
+
+    // Batch Paste Modal
+    batchPasteTitle: 'Tampal Pukal dari Excel / LIMS Makmal',
+    pasteAreaLabel: 'Tampal lajur data (Excel / CSV / teks berjarak):',
+    tryDemoData: 'Cuba Contoh Data',
+    statsPreviewTitle: 'Pratonton Statistik ({n} bacaan dikesan):',
+    modeReplace: 'Gantikan Semua',
+    modeReplaceDesc: 'Padam {n} sedia ada',
+    modeAppend: 'Tambah (Append)',
+    modeAppendDesc: 'Gabungkan dengan {n} sedia ada',
+    confirmPaste: 'Sahkan & Masukkan ({n} Nilai)',
+
+    // Equipment Library Modal
+    eqLibTitle: 'Pustaka Peralatan & Sijil Kalibrasi Makmal',
+    eqLibSubtitle: 'Pilih radas yang telah ditentukur untuk disuntik terus ke dalam Komponen Type B.',
+    btnRegisterNewEq: 'Daftar Radas Baharu',
+    btnInjectToBudget: 'Suntik ke Bajet',
+    searchEqPlaceholder: 'Cari nama peralatan, kod aset (EQ-BAL-01), atau nombor sijil...',
+    formNewEqTitle: 'Borang Pendaftaran Radas / Bahan Standard Makmal Baharu',
+    eqNameLabel: 'Nama Lengkap Peralatan / CRM *',
+    eqCodeLabel: 'Kod Aset / Tag Makmal *',
+    eqCatLabel: 'Kategori Radas',
+    eqCertLabel: 'No. Sijil Kalibrasi / Lot CRM',
+    eqCalDateLabel: 'Tarikh Kalibrasi Terkini',
+    eqValueLabel: 'Nilai Ketakpastian Dinyatakan (a) *',
+    eqUnitLabel: 'Unit Pengukuran',
+    eqDistLabel: 'Jenis Taburan Kebarangkalian',
+    saveToLib: 'Simpan ke Pustaka',
+    backToList: 'Kembali ke Senarai',
+
+    // Version Diff Modal
+    diffTitle: 'Perbandingan Pindaan Versi (Audit Diff)',
+    diffSubtitle: 'Membandingkan rekod induk [{code}] dengan draf baharu bagi semakan ISO/IEC 17025.',
+    noParentTitle: 'Tiada Rekod Versi Terdahulu',
+    noParentDesc: 'Rekod ini adalah versi pertama (v{v}) yang dibina dari templat atau draf baharu, tanpa rekod induk (parent).',
+    deltaMeanTitle: 'Perubahan Min (x̄)',
+    deltaUcTitle: 'Ketakpastian Gabungan (u_c)',
+    deltaUTitle: 'Ketakpastian Diperluas (U)',
+    secTypeADiff: '1. Perubahan Data Replikasi Type A',
+    secTypeBDiff: '2. Perbezaan Komponen Type B ({mod} Dipinda, {add} Ditambah, {rem} Dibuang)',
+    chipModified: 'NILAI DIPINDA',
+    chipAdded: 'BARU DITAMBAH',
+    chipRemoved: 'DIPADAM DARI VERSI 2.0',
+    noTypeBChanges: 'Tiada perubahan pada komponen Type B. Hanya data Type A atau nota pengesahan yang dikemas kini.',
+    btnApproveVersion: 'Sahkan & Luluskan v{v}',
+
+    // Sheet Preview Modal
+    sheetPreviewTitle: 'Pratonton Kanvas Laporan A4 WYSIWYG',
+    btnExportPdf: 'Cetak / Eksport PDF',
+    closePreview: 'Tutup Pratonton',
+    printNow: 'Cetak Sekarang',
+    labHeaderTitle: 'MAKMAL PENGUJIAN & KALIBRASI STANDARD',
+    labHeaderSub: 'Skim Akreditasi Makmal Malaysia (SAMM) • MS ISO/IEC 17025',
+    labHeaderSub2: 'Dokumen Rasmi Anggaran Ketakpastian Pengukuran Makmal (Klausa 7.6)',
+    docNoLabel: 'No. Dokumen:',
+    methodVerLabel: 'Versi Kaedah:',
+    effectiveDateLabel: 'Tarikh Kuat Kuasa:',
+    statusLabel: 'Status:',
+    officialReportTitle: 'LAPORAN PENILAIAN KETAKPASTIAN PENGUKURAN (UNCERTAINTY BUDGET REPORT)',
+    tableParamHeader: 'Parameter / Ujian',
+    tableCatMatrixHeader: 'Kategori & Matriks',
+    tableStdRefHeader: 'Piawaian Rujukan',
+    tableUnitHeader: 'Unit Pengukuran',
+    tableRepSummary: '1. Penilaian Ketakpastian Jenis A (Type A Repeatability)',
+    tableCompSummary: '2. Jadual Komponen Ketakpastian (Type B & Gabungan)',
+    reportedStatementBox: 'Keputusan Dilaporkan:',
+    footnoteText: 'Ketakpastian pengukuran diperluas dilaporkan mengikut panduan EURACHEM/CITAC CG4 dan ISO/GUM dengan faktor liputan k=2 memberikan tahap keyakinan anggaran 95%.',
+    signPreparedBy: 'Disediakan Oleh (Analyst):',
+    signApprovedBy: 'Disemak & Diluluskan (Technical Manager):',
+    dateLabel: 'Tarikh:',
+    pageNumber: 'Halaman 1 daripada 1',
+  },
+
+  en: {
+    // Brand & General
+    appTitle: 'LabMU Pro',
+    appSubtitle: 'Laboratory Measurement Uncertainty Estimation System (ISO/IEC 17025)',
+    clause76: 'ISO/IEC 17025 Clause 7.6',
+    activeMode: 'Active Role',
+    analystName: 'Analyst (Ahmad)',
+    managerName: 'Technical Manager (Dr. Siti)',
+    close: 'Close',
+    cancel: 'Cancel',
+    save: 'Save',
+    delete: 'Delete',
+    edit: 'Edit',
+    review: 'Review',
+    view: 'View',
+    clone: 'Clone',
+    print: 'Print',
+    back: 'Back',
+    confirm: 'Confirm',
+    unit: 'Unit',
+    search: 'Search',
+    all: 'All',
+
+    // Navbar
+    navBrandSub: '/ ISO/IEC 17025',
+    roleAnalyst: 'Analyst',
+    roleManager: 'Manager',
+    backup: 'Backup',
+    restore: 'Restore',
+    resetDemo: 'Reset Demo',
+    equipmentLibNav: 'Equipment Registry',
+    langToggle: 'BM',
+    backupSuccess: 'Successfully restored {n} uncertainty budget records.',
+    backupError: 'JSON backup file restoration error.',
+    resetConfirm: 'Are you sure you want to reset all data to the default accredited laboratory demo set?',
+
+    // Dashboard
+    dashTitle: 'Measurement Uncertainty Budget Database',
+    dashSubtitle: 'ISO/IEC 17025 Clause 7.6 Uncertainty Management & Verification System',
+    presetTemplates: 'Preset Templates',
+    createNewBudget: 'Create New Budget',
+    totalBudgets: 'Total Budget Records',
+    methodsCount: 'methods',
+    pendingReview: 'Pending Approval',
+    actionRequired: 'action required',
+    inReview: 'in review',
+    approvedLock: 'Approved (Audit Locked)',
+    readyAudit: 'audit-ready',
+    draftOrRevision: 'Draft / Revisions',
+    notFinalized: 'in progress',
+    searchPlaceholder: 'Search by SOP code, test name, or matrix...',
+    categoryFilter: 'Category:',
+    allCategories: 'All Categories',
+    chemEurachem: 'Chemical (EURACHEM)',
+    bioIso: 'Biological (ISO 19036)',
+    allStatuses: 'All Statuses',
+    statusDraft: 'Draft',
+    statusSubmitted: 'Pending Review',
+    statusApproved: 'Approved',
+    statusRejected: 'Needs Revision',
+    colSopCode: 'SOP Code / Method',
+    colParameter: 'Test Parameter Name',
+    colCategoryMatrix: 'Category & Matrix',
+    colExpandedU: 'Expanded Uncertainty (U)',
+    colStatus: 'Record Status',
+    colActions: 'Actions',
+    noRecordsFound: 'No budget records found.',
+    noRecordsHint: 'Please check your search filters or start with a Preset Template.',
+    preparedBy: 'Prepared by',
+    approvedBy: 'Approved by',
+    clonedFrom: 'Cloned from',
+    deleteDraftConfirm: 'Are you sure you want to delete draft budget [{code}]?',
+
+    // Budget Builder
+    btnFormulaInspector: 'Formula Inspector',
+    btnPrintA4: 'A4 Report',
+    btnCloneVersion: 'Clone to v{v}',
+    btnSaveDraft: 'Save Draft',
+    btnSubmitReview: 'Submit for Review',
+    btnReject: 'Reject',
+    btnApprove: 'Approve',
+    auditLockNotice: 'Record Locked (Audit Lock Active):',
+    auditLockDesc: 'Approved by {user} on {date} in compliance with ISO/IEC 17025. Direct editing is disabled.',
+    auditLockHint: 'Use "Clone to v{v}" for annual calibration updates.',
+    rejectionNoticeTitle: 'Quality Manager Review Comments:',
+    rejectionFixHint: 'Please revise the values below, then click "Submit for Review".',
+    acVerifierBar: 'PRD Acceptance Criteria Verification:',
+    ac01Btn: 'Test AC-01 (Type A)',
+    ac02Btn: 'Test AC-02 (Type B)',
+    ac03Btn: 'Test AC-03 (ISO 19036)',
+    autoSaved: 'Auto-Saved',
+    autoSaving: 'Saving...',
+    unsavedChanges: 'Unsaved draft changes',
+    unsavedWarning: 'You have unsaved changes. Would you like to save them before returning?',
+
+    // Builder Sections
+    sec1Title: '1. Method Information & Testing Metadata',
+    fieldName: 'Test Method / Parameter Name',
+    fieldCode: 'Laboratory SOP Code',
+    fieldEngine: 'Calculation Engine',
+    fieldMatrix: 'Sample Matrix',
+    fieldUnit: 'Measurement Unit',
+    fieldNotes: 'Method Notes & Standard References',
+    notesPlaceholder: 'E.g.: ICP-MS Spectrometry according to APHA 3125 B standard',
+    optChem: 'Chemical',
+    optBio: 'Biological',
+
+    sec2TitleChem: '2. Type A Component (Replicate Series Evaluation)',
+    enableTypeA: 'Enable Type A',
+    batchPasteExcel: 'Batch Paste Excel',
+    readingPlaceholder: 'Reading value...',
+    btnAddReading: '+ Add',
+    repCount: 'Replicates (n)',
+    needMinRep: 'Requires n ≥ 2',
+    meanTest: 'Sample Mean (x̄)',
+    sdSample: 'Standard Deviation (s)',
+    uAStd: 'Uncertainty uA',
+    typeADisabledMsg: 'Type A component is disabled. Only Type B components are combined.',
+
+    sec3TitleChem: '3. Type B Components (Calibration Certificates & Instrument Limits)',
+    equipmentLibBtn: 'Equipment Registry',
+    colSource: 'Uncertainty Source',
+    colValue: 'Value (±a)',
+    colDist: 'Probability Distribution',
+    colDivisor: 'Divisor',
+    colCi: 'ci',
+    colUi: 'Uncertainty (ui)',
+    colVarPct: 'Variance (%)',
+    noTypeBMsg: 'No Type B components added. Add a row or choose from the Equipment Registry.',
+    btnAddTypeBRow: 'Add Type B Component Row',
+    smartAdvisorTitle: 'ISO/EURACHEM Recommendation:',
+    useDistBtn: 'Apply {dist}',
+
+    sec2TitleBio: '2. Food Microbiology Engine (ISO 19036:2019)',
+    batchPasteCfu: 'Batch Paste CFU',
+    plateCountsLabel: 'Colony Replicate Counts (CFU/g)',
+    plateNum: 'Plate #{n}',
+    addCfuBtn: '+ Add CFU',
+    cfuPlaceholder: 'E.g.: 2400',
+    sRLabel: 'sR (Reproducibility SD)',
+    sRHint: 'Reproducibility log10 CFU/g',
+    sRDesc: 'Reproducibility log10 CFU/g',
+    uMatLabel: 'uMat (Matrix Heterogeneity)',
+    uMatHint: 'Matrix uncertainty (0.01–0.05)',
+    uMatDesc: 'Matrix uncertainty (0.01–0.05)',
+    uIncLabel: 'uInc (Incubation Uncertainty)',
+    uIncHint: 'Incubation temperature variance (0.01–0.02)',
+    uIncDesc: 'Incubation temperature variance (0.01–0.02)',
+    lodWarning: 'Limit of Detection (LOD) Advisory:',
+    lodWarningDesc: '0 CFU colony count detected. Per ISO 19036, a limit of detection proxy (<1 CFU or 1) is applied to ensure mathematical validity.',
+
+    // Sticky Rail
+    railTitle: 'Metrology Summary',
+    ucLabel: 'Combined Uncertainty (u_c)',
+    uExpandedLabel: 'Expanded Uncertainty (U = 2 × u_c)',
+    relUncertainty: 'Relative Uncertainty:',
+    isoReportingStatement: 'ISO 17025 Reporting Statement:',
+    btnBreakdown: 'Step-by-Step Breakdown',
+    btnSheetPreview: 'WYSIWYG A4 Canvas Preview',
+    auditorHelp: 'Auditor Quick Reference:',
+    btnToggleSigFigs: '2 Sig Figs',
+    btnToggleRaw: 'Raw Value',
+
+    // Pareto Chart
+    paretoTitle: 'Pareto Analysis & Variance Contribution (80/20 Rule)',
+    paretoSubtitle: 'Identify the dominant error sources driving combined uncertainty (u_c²).',
+    tabParetoChart: 'Pareto Chart',
+    tabCumTable: 'Cumulative Table',
+    topContributorTag: 'Dominant Contributor ({pct}%):',
+    topContributorAdvice: '"{name}" is the primary uncertainty contributor. To achieve significant uncertainty reduction, targeted improvement should focus here.',
+    pareto80RuleNote: 'ISO 80/20 Rule: Laboratory measurement uncertainty is typically dominated by 1 or 2 sources.',
+    totalVarianceText: 'Total Variance: 100.0%',
+    colRank: 'Rank',
+    colVarianceUi2: 'u_i² (Variance)',
+    colCumulative: 'Cumulative (%)',
+
+    // Audit Trail
+    auditTrailTitle: 'Audit Trail & Approval History',
+
+    // Formula Inspector
+    formulaInspectorTitle: 'Interactive Mathematical Formula Inspector',
+    formulaInspectorSub: 'Calculation breakdown for method: {code} ({name})',
+    tabFlowOverview: 'Metrological Flow Overview',
+    tabStep1TypeA: '1. Type A (u_A = s / √n)',
+    tabStep2TypeB: '2. Type B (u_i = (a / div) × c_i)',
+    tabStep3Combined: '3. Combined (u_c)',
+    tabStep4Expanded: '4. Expanded (U = k × u_c)',
+    reportedStatementTitle: 'ISO 17025 Laboratory Test Report Statement (Clause 7.8.3.1):',
+    closeInspector: 'Close Inspector',
+
+    // Batch Paste Modal
+    batchPasteTitle: 'Batch Paste from Excel / LIMS',
+    pasteAreaLabel: 'Paste data column (Excel / CSV / space-separated):',
+    tryDemoData: 'Try Demo Data',
+    statsPreviewTitle: 'Statistical Preview ({n} readings detected):',
+    modeReplace: 'Replace All',
+    modeReplaceDesc: 'Delete existing {n}',
+    modeAppend: 'Append',
+    modeAppendDesc: 'Append to existing {n}',
+    confirmPaste: 'Confirm & Insert ({n} Values)',
+
+    // Equipment Library Modal
+    eqLibTitle: 'Laboratory Equipment & Calibration Certificate Registry',
+    eqLibSubtitle: 'Select calibrated equipment to insert directly into Type B Uncertainty components.',
+    btnRegisterNewEq: 'Register New Equipment',
+    btnInjectToBudget: 'Insert into Budget',
+    searchEqPlaceholder: 'Search equipment name, asset code (EQ-BAL-01), or cert no...',
+    formNewEqTitle: 'New Equipment / Reference Standard Registration Form',
+    eqNameLabel: 'Full Equipment / CRM Name *',
+    eqCodeLabel: 'Asset Code / Lab Tag *',
+    eqCatLabel: 'Equipment Category',
+    eqCertLabel: 'Calibration Cert / Lot Number',
+    eqCalDateLabel: 'Last Calibration Date',
+    eqValueLabel: 'Stated Uncertainty Limit (a) *',
+    eqUnitLabel: 'Measurement Unit',
+    eqDistLabel: 'Probability Distribution Type',
+    saveToLib: 'Save to Registry',
+    backToList: 'Back to List',
+
+    // Version Diff Modal
+    diffTitle: 'Version Revision Comparison (Audit Diff)',
+    diffSubtitle: 'Comparing parent record [{code}] with current revision for ISO/IEC 17025 review.',
+    noParentTitle: 'No Previous Parent Record',
+    noParentDesc: 'This record is version 1.0 created from scratch or a starter template with no predecessor.',
+    deltaMeanTitle: 'Mean Delta (x̄)',
+    deltaUcTitle: 'Combined Uncertainty Delta (u_c)',
+    deltaUTitle: 'Expanded Uncertainty Delta (U)',
+    secTypeADiff: '1. Type A Replicate Data Changes',
+    secTypeBDiff: '2. Type B Components Differences ({mod} Modified, {add} Added, {rem} Removed)',
+    chipModified: 'VALUE MODIFIED',
+    chipAdded: 'NEWLY ADDED',
+    chipRemoved: 'REMOVED FROM V2.0',
+    noTypeBChanges: 'No differences in Type B components. Only Type A readings or metadata were modified.',
+    btnApproveVersion: 'Verify & Approve v{v}',
+
+    // Sheet Preview Modal
+    sheetPreviewTitle: 'WYSIWYG A4 Report Canvas Preview',
+    btnExportPdf: 'Print / Export PDF',
+    closePreview: 'Close Preview',
+    printNow: 'Print Now',
+    labHeaderTitle: 'STANDARD TESTING & CALIBRATION LABORATORY',
+    labHeaderSub: 'Laboratory Accreditation Scheme of Malaysia (SAMM) • MS ISO/IEC 17025',
+    labHeaderSub2: 'Official Laboratory Measurement Uncertainty Estimation Document (Clause 7.6)',
+    docNoLabel: 'Document No:',
+    methodVerLabel: 'Method Version:',
+    effectiveDateLabel: 'Effective Date:',
+    statusLabel: 'Status:',
+    officialReportTitle: 'MEASUREMENT UNCERTAINTY ESTIMATION BUDGET REPORT',
+    tableParamHeader: 'Parameter / Test',
+    tableCatMatrixHeader: 'Category & Matrix',
+    tableStdRefHeader: 'Standard Reference',
+    tableUnitHeader: 'Measurement Unit',
+    tableRepSummary: '1. Type A Repeatability Uncertainty Evaluation',
+    tableCompSummary: '2. Uncertainty Components Table (Type B & Combined)',
+    reportedStatementBox: 'Reported Measurement Result:',
+    footnoteText: 'Expanded measurement uncertainty is stated in accordance with EURACHEM/CITAC CG4 and ISO/GUM with coverage factor k=2 providing an approximate confidence level of 95%.',
+    signPreparedBy: 'Prepared by (Analyst):',
+    signApprovedBy: 'Reviewed & Approved by (Technical Manager):',
+    dateLabel: 'Date:',
+    pageNumber: 'Page 1 of 1',
+  },
+};
+
+interface LanguageContextType {
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: keyof typeof translations['ms'], params?: Record<string, string | number>) => string;
+}
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [language, setLanguageState] = useState<Language>(() => {
+    try {
+      const stored = localStorage.getItem(LANGUAGE_KEY);
+      return stored === 'en' ? 'en' : 'ms';
+    } catch {
+      return 'ms';
+    }
+  });
+
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
+    try {
+      localStorage.setItem(LANGUAGE_KEY, lang);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const t = (key: keyof typeof translations['ms'], params?: Record<string, string | number>): string => {
+    const dict = translations[language] || translations.ms;
+    let str = (dict as any)[key] || (translations.ms as any)[key] || key;
+
+    if (params) {
+      Object.entries(params).forEach(([k, v]) => {
+        str = str.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v));
+      });
+    }
+
+    return str;
+  };
+
+  return React.createElement(
+    LanguageContext.Provider,
+    { value: { language, setLanguage, t } },
+    children
+  );
+};
+
+export const useLanguage = (): LanguageContextType => {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
+};

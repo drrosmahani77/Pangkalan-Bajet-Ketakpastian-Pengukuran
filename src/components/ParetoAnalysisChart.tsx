@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { UncertaintyBudget } from '../types/labmu';
 import { formatLabNumber } from '../utils/math';
+import { useLanguage } from '../utils/i18n';
 import { BarChart3, PieChart, AlertCircle, Info, Sparkles } from 'lucide-react';
 
 interface ParetoItem {
@@ -17,6 +18,7 @@ interface ParetoAnalysisChartProps {
 }
 
 export const ParetoAnalysisChart: React.FC<ParetoAnalysisChartProps> = ({ budget }) => {
+  const { t, language } = useLanguage();
   const [activeView, setActiveView] = useState<'BAR' | 'TABLE'>('BAR');
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
@@ -24,23 +26,25 @@ export const ParetoAnalysisChart: React.FC<ParetoAnalysisChartProps> = ({ budget
   const items: ParetoItem[] = React.useMemo(() => {
     let raw: { id: string; name: string; category: string; ui: number; percentage: number }[] = [];
 
+    const isEn = language === 'en';
+
     if (budget.category === 'CHEMICAL') {
       if (budget.typeA.enabled && budget.typeA.readings.length >= 2) {
         raw.push({
           id: 'type-a-rep',
-          name: 'Type A: Replikasi Ujian Makmal (s / √n)',
-          category: 'Replikasi',
+          name: isEn ? 'Type A: Test Repeatability (s / √n)' : 'Type A: Replikasi Ujian Makmal (s / √n)',
+          category: isEn ? 'Repeatability' : 'Replikasi',
           ui: budget.typeA.standardUncertainty,
           percentage: budget.typeA.varianceContribution || 0,
         });
       }
 
       budget.typeBComponents.forEach(comp => {
-        let cat = 'Peralatan';
+        let cat = isEn ? 'Equipment' : 'Peralatan';
         const srcLower = comp.source.toLowerCase();
-        if (srcLower.includes('crm') || srcLower.includes('standard') || srcLower.includes('rujukan')) cat = 'Bahan Standard';
-        else if (srcLower.includes('pipet') || srcLower.includes('kelalang') || srcLower.includes('buret') || srcLower.includes('volum')) cat = 'Volumetrik';
-        else if (srcLower.includes('suhu') || srcLower.includes('persekitaran')) cat = 'Persekitaran';
+        if (srcLower.includes('crm') || srcLower.includes('standard') || srcLower.includes('rujukan')) cat = isEn ? 'Reference Std' : 'Bahan Standard';
+        else if (srcLower.includes('pipet') || srcLower.includes('kelalang') || srcLower.includes('buret') || srcLower.includes('volum')) cat = isEn ? 'Volumetric' : 'Volumetrik';
+        else if (srcLower.includes('suhu') || srcLower.includes('persekitaran') || srcLower.includes('temp')) cat = isEn ? 'Environment' : 'Persekitaran';
 
         raw.push({
           id: comp.id,
@@ -55,22 +59,22 @@ export const ParetoAnalysisChart: React.FC<ParetoAnalysisChartProps> = ({ budget
       if (bio) {
         raw.push({
           id: 'bio-sr',
-          name: 'sR (Kebolehulangan Replikasi Koloni CFU)',
-          category: 'Replikasi',
+          name: isEn ? 'sR (CFU Colony Replicate Reproducibility)' : 'sR (Kebolehulangan Replikasi Koloni CFU)',
+          category: isEn ? 'Repeatability' : 'Replikasi',
           ui: bio.sR,
           percentage: bio.varianceContribution_sR || 0,
         });
         raw.push({
           id: 'bio-mat',
-          name: 'uMat (Heterogeniti Matriks Sampel Makanan)',
-          category: 'Matriks',
+          name: isEn ? 'uMat (Food Matrix Heterogeneity)' : 'uMat (Heterogeniti Matriks Sampel Makanan)',
+          category: isEn ? 'Matrix' : 'Matriks',
           ui: bio.uMat,
           percentage: bio.varianceContribution_uMat || 0,
         });
         raw.push({
           id: 'bio-inc',
-          name: 'uInc (Variasi Pengeraman Suhu & Masa)',
-          category: 'Pengeraman',
+          name: isEn ? 'uInc (Incubation Time & Temp Variation)' : 'uInc (Variasi Pengeraman Suhu & Masa)',
+          category: isEn ? 'Incubation' : 'Pengeraman',
           ui: bio.uInc,
           percentage: bio.varianceContribution_uInc || 0,
         });
@@ -89,24 +93,29 @@ export const ParetoAnalysisChart: React.FC<ParetoAnalysisChartProps> = ({ budget
         cumulative: Math.min(100, cum),
       };
     });
-  }, [budget]);
+  }, [budget, language]);
 
   const topContributor = items[0];
-  const itemsAbove80 = items.filter(it => it.cumulative <= 85 || it.percentage > 15);
 
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'Replikasi':
+      case 'Repeatability':
         return 'bg-sky-500 text-sky-700 border-sky-200';
       case 'Bahan Standard':
+      case 'Reference Std':
         return 'bg-emerald-500 text-emerald-700 border-emerald-200';
       case 'Volumetrik':
+      case 'Volumetric':
         return 'bg-purple-500 text-purple-700 border-purple-200';
       case 'Persekitaran':
+      case 'Environment':
         return 'bg-amber-500 text-amber-700 border-amber-200';
       case 'Matriks':
+      case 'Matrix':
         return 'bg-teal-500 text-teal-700 border-teal-200';
       case 'Pengeraman':
+      case 'Incubation':
         return 'bg-orange-500 text-orange-700 border-orange-200';
       default:
         return 'bg-indigo-500 text-indigo-700 border-indigo-200';
@@ -122,11 +131,11 @@ export const ParetoAnalysisChart: React.FC<ParetoAnalysisChartProps> = ({ budget
           <div className="flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-sky-600" />
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-              Analisis Pareto & Sumbangan Varians Ketakpastian (80/20 Rule)
+              {t('paretoTitle')}
             </h3>
           </div>
           <p className="text-[11px] text-slate-500 mt-0.5">
-            Mengenal pasti sumber ralat utama yang mempengaruhi ketakpastian gabungan (u_c²).
+            {t('paretoSubtitle')}
           </p>
         </div>
 
@@ -138,7 +147,7 @@ export const ParetoAnalysisChart: React.FC<ParetoAnalysisChartProps> = ({ budget
               activeView === 'BAR' ? 'bg-white shadow-2xs text-slate-900 font-semibold' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            Carta Pareto
+            {t('tabParetoChart')}
           </button>
           <button
             type="button"
@@ -147,7 +156,7 @@ export const ParetoAnalysisChart: React.FC<ParetoAnalysisChartProps> = ({ budget
               activeView === 'TABLE' ? 'bg-white shadow-2xs text-slate-900 font-semibold' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            Jadual Kumulatif
+            {t('tabCumTable')}
           </button>
         </div>
       </div>
@@ -158,10 +167,10 @@ export const ParetoAnalysisChart: React.FC<ParetoAnalysisChartProps> = ({ budget
           <Sparkles className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
           <div className="space-y-0.5">
             <span className="font-semibold text-sky-900">
-              Penyumbang Ralat Dominan ({topContributor.percentage.toFixed(1)}%):
+              {t('topContributorTag', { pct: topContributor.percentage.toFixed(1) })}
             </span>
             <p className="text-sky-800 text-[11px]">
-              <strong>"{topContributor.name}"</strong> merupakan punca ralat terbesar dalam kaedah ini. Untuk mengurangkan nilai U secara signifikan, fokus penambahbaikan perlu diberikan kepada komponen ini (contoh: gunakan mikropipet yang lebih tinggi ketepatan atau tingkatkan bilangan replikasi).
+              {t('topContributorAdvice', { name: topContributor.name })}
             </p>
           </div>
         </div>
@@ -225,8 +234,8 @@ export const ParetoAnalysisChart: React.FC<ParetoAnalysisChartProps> = ({ budget
           })}
 
           <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-100">
-            <span>Peraturan 80/20 ISO: Ralat makmal lazimnya dikuasai oleh 1 hingga 2 komponen utama.</span>
-            <span className="font-mono">Jumlah Varians: 100.0%</span>
+            <span>{t('pareto80RuleNote')}</span>
+            <span className="font-mono">{t('totalVarianceText')}</span>
           </div>
         </div>
       ) : (
@@ -235,13 +244,13 @@ export const ParetoAnalysisChart: React.FC<ParetoAnalysisChartProps> = ({ budget
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold text-[11px]">
-                <th className="py-2 px-3">Kedudukan</th>
-                <th className="py-2 px-3">Komponen Ketakpastian</th>
-                <th className="py-2 px-3">Kategori</th>
+                <th className="py-2 px-3">{t('colRank')}</th>
+                <th className="py-2 px-3">{t('colSource')}</th>
+                <th className="py-2 px-3">{language === 'en' ? 'Category' : 'Kategori'}</th>
                 <th className="py-2 px-3 text-right">u_i</th>
-                <th className="py-2 px-3 text-right">u_i² (Varians)</th>
-                <th className="py-2 px-3 text-right">Sumbangan (%)</th>
-                <th className="py-2 px-3 text-right">Kumulatif (%)</th>
+                <th className="py-2 px-3 text-right">{t('colVarianceUi2')}</th>
+                <th className="py-2 px-3 text-right">{t('colVarPct')}</th>
+                <th className="py-2 px-3 text-right">{t('colCumulative')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-mono text-[11px]">

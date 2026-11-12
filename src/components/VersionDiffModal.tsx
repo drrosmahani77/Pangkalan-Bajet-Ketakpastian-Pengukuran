@@ -1,6 +1,7 @@
 import React from 'react';
 import { UncertaintyBudget } from '../types/labmu';
 import { formatLabNumber } from '../utils/math';
+import { useLanguage } from '../utils/i18n';
 import { 
   X, 
   GitCompare, 
@@ -30,6 +31,9 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
   onApprove,
   isManagerReview = false,
 }) => {
+  const { t, language } = useLanguage();
+  const isEn = language === 'en';
+
   if (!isOpen) return null;
 
   if (!parentBudget) {
@@ -37,16 +41,16 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
         <div className="bg-white rounded-2xl p-6 max-w-md w-full text-center space-y-4">
           <FileText className="w-10 h-10 text-slate-400 mx-auto" />
-          <h3 className="font-bold text-slate-800 text-sm">Tiada Rekod Versi Terdahulu</h3>
+          <h3 className="font-bold text-slate-800 text-sm">{t('noParentTitle')}</h3>
           <p className="text-xs text-slate-500">
-            Rekod ini adalah versi pertama (v{currentBudget.version}) yang dibina dari templat atau draf baharu, tanpa rekod induk (parent).
+            {t('noParentDesc', { v: currentBudget.version })}
           </p>
           <button
             type="button"
             onClick={onClose}
             className="px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-semibold"
           >
-            Tutup
+            {t('close')}
           </button>
         </div>
       </div>
@@ -103,6 +107,7 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
         aria-labelledby="version-diff-title"
       >
         {/* Header */}
+        {/* Header */}
         <div className="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center">
@@ -110,13 +115,13 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
             </div>
             <div>
               <h2 id="version-diff-title" className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <span>Perbandingan Pindaan Versi (Audit Diff)</span>
+                <span>{t('diffTitle')}</span>
                 <span className="font-mono text-xs px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">
                   v{parentBudget.version} ➔ v{currentBudget.version}
                 </span>
               </h2>
               <p className="text-xs text-slate-500">
-                Membandingkan rekod induk [{parentBudget.testCode}] dengan draf baharu bagi semakan ISO/IEC 17025.
+                {t('diffSubtitle', { code: parentBudget.testCode })}
               </p>
             </div>
           </div>
@@ -134,7 +139,7 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
           {/* Delta KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
-              <span className="text-[11px] font-semibold text-slate-500 uppercase">Perubahan Min (x̄)</span>
+              <span className="text-[11px] font-semibold text-slate-500 uppercase">{t('deltaMeanTitle')}</span>
               <div className="flex items-center gap-2 font-mono text-base font-bold text-slate-900">
                 <span>{formatLabNumber(parentBudget.typeA.mean, 4)}</span>
                 <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
@@ -146,7 +151,7 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
             </div>
 
             <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
-              <span className="text-[11px] font-semibold text-slate-500 uppercase">Ketakpastian Gabungan (u_c)</span>
+              <span className="text-[11px] font-semibold text-slate-500 uppercase">{t('deltaUcTitle')}</span>
               <div className="flex items-center gap-2 font-mono text-base font-bold text-slate-900">
                 <span>{formatLabNumber(parentBudget.results.combinedUncertainty, 4)}</span>
                 <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
@@ -158,7 +163,7 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
             </div>
 
             <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
-              <span className="text-[11px] font-semibold text-slate-500 uppercase">Ketakpastian Diperluas (U)</span>
+              <span className="text-[11px] font-semibold text-slate-500 uppercase">{t('deltaUTitle')}</span>
               <div className="flex items-center gap-2 font-mono text-base font-bold text-slate-900">
                 <span>±{formatLabNumber(parentBudget.results.expandedUncertainty, 4)}</span>
                 <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
@@ -173,15 +178,15 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
           {/* Section: Type A Replicate Comparison */}
           <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3">
             <h3 className="font-bold text-slate-800 text-xs uppercase tracking-wide flex items-center justify-between">
-              <span>1. Perubahan Data Replikasi Type A</span>
+              <span>{t('secTypeADiff')}</span>
               <span className="font-mono text-[11px] text-slate-500 font-normal">
-                {parentBudget.typeA.readings.length} bacaan ➔ {currentBudget.typeA.readings.length} bacaan
+                {parentBudget.typeA.readings.length} {isEn ? 'readings' : 'bacaan'} ➔ {currentBudget.typeA.readings.length} {isEn ? 'readings' : 'bacaan'}
               </span>
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono">
               <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
-                <span className="text-[10px] text-slate-500 block uppercase font-sans font-semibold">Versi Asal v{parentBudget.version}</span>
+                <span className="text-[10px] text-slate-500 block uppercase font-sans font-semibold">{isEn ? 'Original' : 'Versi Asal'} v{parentBudget.version}</span>
                 <div className="text-slate-700 mt-1 truncate">
                   [{parentBudget.typeA.readings.join(', ')}]
                 </div>
@@ -192,7 +197,7 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
               </div>
 
               <div className="bg-sky-50/50 p-3 rounded-lg border border-sky-200">
-                <span className="text-[10px] text-sky-800 block uppercase font-sans font-semibold">Versi Baharu v{currentBudget.version}</span>
+                <span className="text-[10px] text-sky-800 block uppercase font-sans font-semibold">{isEn ? 'New Version' : 'Versi Baharu'} v{currentBudget.version}</span>
                 <div className="text-sky-950 font-bold mt-1 truncate">
                   [{currentBudget.typeA.readings.join(', ')}]
                 </div>
@@ -207,7 +212,7 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
           {/* Section: Type B Component Differences */}
           <div className="bg-white rounded-xl border border-slate-200 p-4 space-y-3">
             <h3 className="font-bold text-slate-800 text-xs uppercase tracking-wide">
-              2. Perbezaan Komponen Type B ({modifiedComponents.length} Dipinda, {addedComponents.length} Ditambah, {removedComponents.length} Dibuang)
+              {t('secTypeBDiff', { mod: modifiedComponents.length, add: addedComponents.length, rem: removedComponents.length })}
             </h3>
 
             {/* Modified */}
@@ -219,11 +224,11 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
                     <span>{mod.source}</span>
                   </div>
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-200 text-amber-900 font-mono">
-                    NILAI DIPINDA
+                    {t('chipModified')}
                   </span>
                 </div>
                 <div className="flex items-center gap-3 font-mono text-[11px] text-amber-900 pt-1">
-                  <span>Nilai: <del className="text-slate-400">{mod.oldVal}</del> ➔ <strong className="text-amber-800">{mod.newVal}</strong></span>
+                  <span>{isEn ? 'Value' : 'Nilai'}: <del className="text-slate-400">{mod.oldVal}</del> ➔ <strong className="text-amber-800">{mod.newVal}</strong></span>
                   <span>·</span>
                   <span>u_i: <del className="text-slate-400">{formatLabNumber(mod.oldUi, 5)}</del> ➔ <strong>{formatLabNumber(mod.newUi, 5)}</strong></span>
                 </div>
@@ -239,11 +244,11 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
                     <span>{add.source}</span>
                   </div>
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-200 text-emerald-900 font-mono">
-                    BARU DITAMBAH
+                    {t('chipAdded')}
                   </span>
                 </div>
                 <div className="font-mono text-[11px] text-emerald-900">
-                  Nilai: {add.value} {add.unit} ({add.distribution}) ➔ u_i = {formatLabNumber(add.standardUncertainty, 5)}
+                  {isEn ? 'Value' : 'Nilai'}: {add.value} {add.unit} ({add.distribution}) ➔ u_i = {formatLabNumber(add.standardUncertainty, 5)}
                 </div>
               </div>
             ))}
@@ -257,7 +262,7 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
                     <span className="line-through">{rem.source}</span>
                   </div>
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-200 text-rose-900 font-mono">
-                    DIPADAM DARI VERSI 2.0
+                    {t('chipRemoved')}
                   </span>
                 </div>
               </div>
@@ -265,7 +270,7 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
 
             {modifiedComponents.length === 0 && addedComponents.length === 0 && removedComponents.length === 0 && (
               <p className="text-slate-500 text-[11px] italic">
-                Tiada perubahan pada komponen Type B. Hanya data Type A atau nota pengesahan yang dikemas kini.
+                {t('noTypeBChanges')}
               </p>
             )}
           </div>
@@ -274,7 +279,7 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
         {/* Footer */}
         <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
           <span className="text-slate-500 text-[11px]">
-            Log Audit Induk Terpelihara mengikut ISO/IEC 17025 Klausa 8.4
+            {isEn ? 'Master Audit Log preserved under ISO/IEC 17025 Clause 8.4' : 'Log Audit Induk Terpelihara mengikut ISO/IEC 17025 Klausa 8.4'}
           </span>
           <div className="flex items-center gap-2">
             <button
@@ -282,7 +287,7 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
               onClick={onClose}
               className="px-3.5 py-1.5 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 font-medium transition-colors"
             >
-              Tutup
+              {t('close')}
             </button>
             {isManagerReview && onApprove && (
               <button
@@ -294,7 +299,7 @@ export const VersionDiffModal: React.FC<VersionDiffModalProps> = ({
                 className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-emerald-700 text-white font-semibold hover:bg-emerald-800 transition-colors"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Sahkan & Luluskan v{currentBudget.version}</span>
+                <span>{t('btnApproveVersion', { v: currentBudget.version })}</span>
               </button>
             )}
           </div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { UncertaintyBudget } from '../types/labmu';
 import { formatLabNumber, formatIsoSignificantFigures } from '../utils/math';
+import { useLanguage } from '../utils/i18n';
 import { X, Calculator, Sparkles, BookOpen, Check, Layers, ChevronRight } from 'lucide-react';
 
 interface FormulaInspectorModalProps {
@@ -14,6 +15,7 @@ export const FormulaInspectorModal: React.FC<FormulaInspectorModalProps> = ({
   isOpen,
   onClose,
 }) => {
+  const { t, language } = useLanguage();
   const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'TYPE_A' | 'TYPE_B' | 'COMBINED' | 'EXPANDED'>('OVERVIEW');
 
   if (!isOpen) return null;
@@ -29,6 +31,7 @@ export const FormulaInspectorModal: React.FC<FormulaInspectorModalProps> = ({
   const U = budget.results.expandedUncertainty;
   const relativeU = mean > 0 ? (U / mean) * 100 : 0;
   const sigFigInfo = formatIsoSignificantFigures(mean > 0 ? mean : null, U, budget.unit, k);
+  const isEn = language === 'en';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-in fade-in duration-150">
@@ -46,13 +49,13 @@ export const FormulaInspectorModal: React.FC<FormulaInspectorModalProps> = ({
             </div>
             <div>
               <h2 id="formula-inspector-title" className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <span>Pemeriksa Formula Matematik Interaktif</span>
+                <span>{t('formulaInspectorTitle')}</span>
                 <span className="text-[11px] font-normal px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200 font-mono">
-                  ISO/IEC 17025 Klausa 7.6
+                  {isEn ? 'ISO/IEC 17025 Clause 7.6' : 'ISO/IEC 17025 Klausa 7.6'}
                 </span>
               </h2>
               <p className="text-xs text-slate-500">
-                Pecahan langkah pengiraan bagi kaedah: <strong className="text-slate-700">{budget.testCode}</strong> ({budget.testName})
+                {t('formulaInspectorSub', { code: budget.testCode, name: budget.testName })}
               </p>
             </div>
           </div>
@@ -76,7 +79,7 @@ export const FormulaInspectorModal: React.FC<FormulaInspectorModalProps> = ({
                 : 'border-transparent text-slate-600 hover:text-slate-900'
             }`}
           >
-            Ringkasan Aliran Metrologi
+            {t('tabFlowOverview')}
           </button>
           {isChemical && (
             <>
@@ -89,7 +92,7 @@ export const FormulaInspectorModal: React.FC<FormulaInspectorModalProps> = ({
                     : 'border-transparent text-slate-600 hover:text-slate-900'
                 }`}
               >
-                1. Type A (u_A = s / √n)
+                {t('tabStep1TypeA')}
               </button>
               <button
                 type="button"
@@ -100,7 +103,7 @@ export const FormulaInspectorModal: React.FC<FormulaInspectorModalProps> = ({
                     : 'border-transparent text-slate-600 hover:text-slate-900'
                 }`}
               >
-                2. Type B (u_i = (a / div) × c_i)
+                {t('tabStep2TypeB')}
               </button>
             </>
           )}
@@ -113,7 +116,7 @@ export const FormulaInspectorModal: React.FC<FormulaInspectorModalProps> = ({
                 : 'border-transparent text-slate-600 hover:text-slate-900'
             }`}
           >
-            3. Gabungan (u_c)
+            {t('tabStep3Combined')}
           </button>
           <button
             type="button"
@@ -124,7 +127,7 @@ export const FormulaInspectorModal: React.FC<FormulaInspectorModalProps> = ({
                 : 'border-transparent text-slate-600 hover:text-slate-900'
             }`}
           >
-            4. Diperluas (U = k × u_c)
+            {t('tabStep4Expanded')}
           </button>
         </div>
 
@@ -393,14 +396,14 @@ export const FormulaInspectorModal: React.FC<FormulaInspectorModalProps> = ({
         {/* Footer */}
         <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
           <span className="text-slate-500 text-[11px]">
-            Format Pembundaran ISO/GUM 7.2.6 Diaktifkan
+            {isEn ? 'ISO/GUM 7.2.6 Rounding Format Enabled' : 'Format Pembundaran ISO/GUM 7.2.6 Diaktifkan'}
           </span>
           <button
             type="button"
             onClick={onClose}
             className="px-4 py-1.5 rounded-lg bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-colors"
           >
-            Tutup Pemeriksa
+            {t('closeInspector')}
           </button>
         </div>
       </div>

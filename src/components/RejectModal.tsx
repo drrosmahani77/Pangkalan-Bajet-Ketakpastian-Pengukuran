@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AlertCircle, X } from 'lucide-react';
+import { useLanguage } from '../utils/i18n';
 
 interface RejectModalProps {
   isOpen: boolean;
@@ -16,6 +17,8 @@ export const RejectModal: React.FC<RejectModalProps> = ({
   onClose,
   onConfirm,
 }) => {
+  const { t, language } = useLanguage();
+  const isEn = language === 'en';
   const [reason, setReason] = useState('');
   const [error, setError] = useState('');
 
@@ -24,7 +27,7 @@ export const RejectModal: React.FC<RejectModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!reason.trim()) {
-      setError('Sila nyatakan ulasan pembetulan atau sebab penolakan untuk juruanalisis.');
+      setError(isEn ? 'Please specify corrective review comments or rejection rationale.' : 'Sila nyatakan ulasan pembetulan atau sebab penolakan untuk juruanalisis.');
       return;
     }
     onConfirm(reason.trim());
@@ -40,7 +43,7 @@ export const RejectModal: React.FC<RejectModalProps> = ({
           <div className="flex items-center gap-2 text-rose-700">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <h3 className="font-bold text-slate-900 text-sm">
-              Tolak Bajet untuk Pembetulan
+              {isEn ? 'Reject Budget for Corrections' : 'Tolak Bajet untuk Pembetulan'}
             </h3>
           </div>
           <button
@@ -53,12 +56,12 @@ export const RejectModal: React.FC<RejectModalProps> = ({
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="text-xs text-slate-600">
-            Kaedah: <strong className="font-mono text-slate-900">{testCode}</strong> · {testName}
+            {isEn ? 'Method' : 'Kaedah'}: <strong className="font-mono text-slate-900">{testCode}</strong> · {testName}
           </div>
 
           <div>
             <label className="block text-[11px] font-medium text-slate-700 uppercase tracking-wider mb-1">
-              Ulasan Semakan Pengurus (Audit Note) <span className="text-rose-600">*</span>
+              {isEn ? 'Manager Review Comments (Audit Note)' : 'Ulasan Semakan Pengurus (Audit Note)'} <span className="text-rose-600">*</span>
             </label>
             <textarea
               rows={4}
@@ -67,14 +70,14 @@ export const RejectModal: React.FC<RejectModalProps> = ({
                 setReason(e.target.value);
                 if (error) setError('');
               }}
-              placeholder="Contoh: Sila sahkan nilai ketakpastian volumetrik menggunakan sijil kalibrasi terkini tahun 2026 atau tambah bacaan replikasi ke sekurang-kurangnya 5 titik..."
+              placeholder={isEn ? "Example: Please verify volumetric pipette uncertainty against calibration certificate from 2026 or increase replication count to at least 5 points..." : "Contoh: Sila sahkan nilai ketakpastian volumetrik menggunakan sijil kalibrasi terkini tahun 2026 atau tambah bacaan replikasi ke sekurang-kurangnya 5 titik..."}
               className="w-full text-xs rounded-md border border-slate-200 p-2.5 focus:outline-hidden focus:border-slate-400 text-slate-800 placeholder:text-slate-400"
             />
             {error && (
               <p className="text-[11px] text-rose-600 mt-1 font-medium">{error}</p>
             )}
             <p className="text-[10px] text-slate-400 mt-1">
-              Catatan ini akan direkodkan ke dalam Jejak Audit (Audit Trail) dan dipaparkan kepada Analyst.
+              {isEn ? 'This comment will be permanently stamped into the Audit Trail and visible to the Analyst.' : 'Catatan ini akan direkodkan ke dalam Jejak Audit (Audit Trail) dan dipaparkan kepada Analyst.'}
             </p>
           </div>
 
@@ -84,13 +87,13 @@ export const RejectModal: React.FC<RejectModalProps> = ({
               onClick={onClose}
               className="px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-800 rounded transition-colors"
             >
-              Batal
+              {t('cancel')}
             </button>
             <button
               type="submit"
               className="px-4 py-1.5 text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white rounded transition-colors"
             >
-              Sahkan Penolakan
+              {isEn ? 'Confirm Rejection' : 'Sahkan Penolakan'}
             </button>
           </div>
         </form>
